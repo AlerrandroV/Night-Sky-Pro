@@ -227,7 +227,13 @@ input:checked + .slider:before {
 
 #datetime input[type="text"],
 #location-inputs input[type="number"],
-#custom-size input {
+#custom_size input {
 	background: #fff;
 	min-width: calc(50% - 5px / 2);
+}
+
+#custom_size {
+	width: 100%;
+	gap: 5px;
+	margin-top: 5px;
 }

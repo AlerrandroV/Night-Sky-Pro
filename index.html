@@ -127,7 +127,7 @@
 
 				<div class="set-item">
 					<label for="frame_format">Formato do quadro:</label>
-					<select id="frame_format">
+					<select id="frame_format" onchange="onFrameFormatChange()">
 						<option value="A4">A4 (21 x 29,7 cm)</option>
 						<option value="A3">A3 (29,7 x 42 cm)</option>
 						<option value="A2">A2 (42 x 59,4 cm)</option>
@@ -138,9 +138,9 @@
 						<option value="60x90">60 x 90 cm</option>
 						<option value="custom">Personalizado</option>
 					</select>
-					<div id="custom_size" style="display:none; margin-top:5px;">
-						<input type="number" id="custom_width" placeholder="Largura (cm)" min="5">
-						<input type="number" id="custom_height" placeholder="Altura (cm)" min="5">
+					<div id="custom_size" style="display:none;">
+						<input type="number" id="custom_width" placeholder="Largura (cm)" min="5" step="0.1" onchange="get_user_obs()">
+						<input type="number" id="custom_height" placeholder="Altura (cm)" min="5" step="0.1" onchange="get_user_obs()">
 					</div>
 				</div>
 

@@ -370,13 +370,9 @@ function set_user_obs() {
 	document.getElementById("dsoLabel_size").value = dsoLabel_size;
 	document.getElementById("dsoLabel_color").value = dsoLabel_color;
 	document.getElementById("frame_format").value = frame_format;
-	if (frame_format === "custom") {
-		document.getElementById("custom_size").style.display = "block";
-		document.getElementById("custom_width").value = frame_custom.w;
-		document.getElementById("custom_height").value = frame_custom.h;
-	} else {
-		document.getElementById("custom_size").style.display = "none";
-	}
+	document.getElementById("custom_width").value = frame_custom.w;
+	document.getElementById("custom_height").value = frame_custom.h;
+	toggleCustomSize();
 
 	document.getElementById("user_starlab").checked = ck_starlabels;
 	document.getElementById("user_conlab").checked = ck_conlabels;
@@ -421,7 +417,7 @@ function get_user_obs() {
 	if (frame_format === "custom") {
 		var w = parseFloat(document.getElementById("custom_width").value);
 		var h = parseFloat(document.getElementById("custom_height").value);
-		if (!isNaN(w) && !isNaN(h)) {
+		if (w >= 5 && h >= 5) {
 			frame_custom = {
 				w: w,
 				h: h
@@ -512,10 +508,12 @@ function currentTime() {
 	document.getElementById("user_time").value = timeString;
 }
 
-document.getElementById("frame_format").addEventListener("change", function () {
-	if (this.value === "custom") {
-		document.getElementById("custom_size").style.display = "block";
-	} else {
-		document.getElementById("custom_size").style.display = "none";
-	}
-});
+function toggleCustomSize() {
+	var custom = document.getElementById("frame_format").value === "custom";
+	document.getElementById("custom_size").style.display = custom ? "flex" : "none";
+}
+
+function onFrameFormatChange() {
+	toggleCustomSize();
+	get_user_obs();
+}
