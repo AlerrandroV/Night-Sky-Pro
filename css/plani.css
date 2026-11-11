@@ -44,7 +44,10 @@ body {
 
 #planicanvas svg {
 	height: 95%;
+	width: auto;
+	max-width: 95%;
 	margin: auto;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.5);
 }
 
 /* Painel de controles */

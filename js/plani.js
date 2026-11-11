@@ -298,64 +298,267 @@ function validateFields() {
 	return valid;
 }
 
+var SVG_NS = "http://www.w3.org/2000/svg";
+var SKY_SIZE = 800;          // sistema de coordenadas usado por draw_sky
+var POSTER_WIDTH = 1000;     // largura do pôster em unidades SVG
+var POSTER_FONT = "'Helvetica Neue', Helvetica, Arial, sans-serif";
+var MAX_CANVAS_AREA = 16777216; // limite de pixels do canvas no Safari/iOS
+
+var resolution = 3000; // lado maior do PNG, em pixels
+
+var FRAME_SIZES = {
+	"A4": { w: 21, h: 29.7 },
+	"A3": { w: 29.7, h: 42 },
+	"A2": { w: 42, h: 59.4 },
+	"15x15": { w: 15, h: 15 },
+	"30x40": { w: 30, h: 40 },
+	"40x50": { w: 40, h: 50 },
+	"50x70": { w: 50, h: 70 },
+	"60x90": { w: 60, h: 90 }
+};
+
+function frame_size_cm() {
+	if (frame_format === "custom") return frame_custom;
+	return FRAME_SIZES[frame_format] || FRAME_SIZES["A4"];
+}
+
+function svg_el(name, attrs) {
+	var el = document.createElementNS(SVG_NS, name);
+	for (var k in attrs) el.setAttribute(k, attrs[k]);
+	return el;
+}
+
+// Quebra o texto em linhas que caibam em maxWidth (medido com canvas)
+function wrap_text(text, fontSize, maxWidth) {
+	var ctx = document.createElement("canvas").getContext("2d");
+	ctx.font = fontSize + "px " + POSTER_FONT;
+	var words = text.split(/\s+/).filter(Boolean);
+	var lines = [];
+	var line = "";
+	for (var i = 0; i < words.length; i++) {
+		var test = line ? line + " " + words[i] : words[i];
+		if (line && ctx.measureText(test).width > maxWidth) {
+			lines.push(line);
+			line = words[i];
+		} else {
+			line = test;
+		}
+	}
+	if (line) lines.push(line);
+	return lines;
+}
+
+function format_coord(value, pos, neg) {
+	var v = parseFloat(value);
+	return Math.abs(v).toFixed(4) + "° " + (v < 0 ? neg : pos);
+}
+
+function poster_texts() {
+	var texts = { message: message.trim(), details: [] };
+	var dt = document.getElementById("user_date").value;
+	var hr = document.getElementById("user_time").value;
+	var lat = document.getElementById("user_lat").value;
+	var lon = document.getElementById("user_lon").value;
+
+	var when = [];
+	if (ck_date && dt) {
+		var p = dt.split("-");
+		var d = new Date(+p[0], +p[1] - 1, +p[2]);
+		when.push(d.toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" }));
+	}
+	if (ck_time && hr) when.push(hr);
+	if (when.length) texts.details.push(when.join("  ·  "));
+	if (ck_coordinates && lat !== "" && lon !== "") {
+		texts.details.push(format_coord(lat, "N", "S") + "   " + format_coord(lon, "E", "W"));
+	}
+	return texts;
+}
+
+// Monta o pôster completo (fundo, céu e textos) no formato escolhido
+function build_poster() {
+	var size = frame_size_cm();
+	var W = POSTER_WIDTH;
+	var H = Math.round(W * size.h / size.w);
+	var margin = 0.08 * Math.min(W, H);
+
+	var svg = svg_el("svg", {
+		xmlns: SVG_NS,
+		width: size.w + "cm",
+		height: size.h + "cm",
+		viewBox: "0 0 " + W + " " + H,
+		"font-family": POSTER_FONT
+	});
+	svg.appendChild(svg_el("rect", { x: 0, y: 0, width: W, height: H, fill: sky_color }));
+
+	// Tamanhos proporcionais ao lado menor, para valer em qualquer formato
+	var unit = Math.min(W, H);
+	var texts = poster_texts();
+	var msgSize = 0.045 * unit;
+	var detSize = 0.024 * unit;
+	var gap = 0.06 * unit;
+	var hasText = texts.message || texts.details.length;
+
+	// Formatos horizontais: céu à esquerda e texto à direita.
+	// Demais formatos: céu em cima e texto embaixo.
+	var landscape = W > H * 1.15;
+	var textW = landscape ? W - 2 * margin - (H - 2 * margin) - gap : W - 2 * margin;
+	var msgLines = texts.message ? wrap_text(texts.message, msgSize, textW) : [];
+	var textH = 0;
+	if (msgLines.length) textH += msgLines.length * msgSize * 1.25;
+	if (texts.details.length) textH += (msgLines.length ? detSize : 0) + texts.details.length * detSize * 1.6;
+
+	var diameter, skyX, skyY, textX, textY;
+	if (landscape) {
+		diameter = H - 2 * margin;
+		if (!hasText) {
+			skyX = (W - diameter) / 2;
+		} else {
+			skyX = margin;
+		}
+		skyY = margin;
+		textX = skyX + diameter + gap + textW / 2;
+		textY = (H - textH) / 2;
+	} else {
+		var availH = H - 2 * margin - (hasText ? textH + gap : 0);
+		diameter = Math.max(0, Math.min(W - 2 * margin, availH));
+		skyX = (W - diameter) / 2;
+		skyY = margin + (availH - diameter) / 2;
+		textX = W / 2;
+		textY = skyY + diameter + gap;
+	}
+
+	var sky = svg_el("svg", {
+		x: skyX, y: skyY, width: diameter, height: diameter,
+		viewBox: "0 0 " + SKY_SIZE + " " + SKY_SIZE
+	});
+	var clip = svg_el("clipPath", { id: "sky-clip" });
+	clip.appendChild(svg_el("circle", { cx: SKY_SIZE / 2, cy: SKY_SIZE / 2, r: SKY_SIZE / 2 }));
+	var defs = svg_el("defs", {});
+	defs.appendChild(clip);
+	sky.appendChild(defs);
+	var skyGroup = svg_el("g", { "clip-path": "url(#sky-clip)" });
+	draw_sky_into(sky, skyGroup);
+	sky.appendChild(skyGroup);
+	sky.appendChild(svg_el("circle", {
+		cx: SKY_SIZE / 2, cy: SKY_SIZE / 2, r: SKY_SIZE / 2 - 1,
+		fill: "none", stroke: star_color, "stroke-opacity": 0.35, "stroke-width": 2
+	}));
+	svg.appendChild(sky);
+
+	// Textos
+	var y = textY;
+	for (var i = 0; i < msgLines.length; i++) {
+		y += msgSize;
+		var t = svg_el("text", {
+			x: textX, y: y, "text-anchor": "middle", fill: star_color,
+			"font-size": msgSize, "font-family": POSTER_FONT, "font-weight": 300
+		});
+		t.textContent = msgLines[i];
+		svg.appendChild(t);
+		y += msgSize * 0.25;
+	}
+	if (msgLines.length && texts.details.length) y += detSize;
+	for (var j = 0; j < texts.details.length; j++) {
+		y += detSize * 1.6;
+		var d = svg_el("text", {
+			x: textX, y: y, "text-anchor": "middle", fill: star_color,
+			"fill-opacity": 0.75, "font-size": detSize, "font-family": POSTER_FONT,
+			"letter-spacing": detSize * 0.08
+		});
+		d.textContent = texts.details[j];
+		svg.appendChild(d);
+	}
+	return svg;
+}
+
+// draw_sky desenha direto no svg do céu (as funções de desenho leem o viewBox
+// dele); depois os elementos são movidos para o grupo recortado no círculo.
+function draw_sky_into(sky, group) {
+	var start = sky.childNodes.length;
+	draw_sky(sky, SKY_SIZE, SKY_SIZE);
+	while (sky.childNodes.length > start) group.appendChild(sky.childNodes[start]);
+}
+
 function refresh() {
 	if (validateFields()) {
-		var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-		svg.setAttribute("width", 800);
-		svg.setAttribute("height", 800);
-		svg.setAttribute("viewBox", "0 0 800 800");
-
-		draw_sky(svg, 800, 800);
-
 		var container = document.getElementById("planicanvas");
 		container.innerHTML = "";
-		container.appendChild(svg);
+		container.appendChild(build_poster());
 	}
 }
 
-function saveImage() {
-	var link = document.createElement('a');
-	var canvas = document.getElementById("planicanvas");
-	var dt = document.getElementById("user_date");
-	var lon = document.getElementById("user_lon");
-	var lat = document.getElementById("user_lat");
-
-	get_user_obs();
-	link.href = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
-	link.download = 'NightSky' + ' - ' + dt.value + ' - ' + lat.value + ' - ' + lon.value + '.png';
-	link.click();
-	window.URL.revokeObjectURL(url);
+function poster_filename(ext) {
+	var dt = document.getElementById("user_date").value;
+	var lat = document.getElementById("user_lat").value;
+	var lon = document.getElementById("user_lon").value;
+	return "Night Sky Pro - " + dt + " - " + lat + " - " + lon + "." + ext;
 }
 
-function saveAsVector() {
-	var size = 800;
-
-	var svgNS = "http://www.w3.org/2000/svg";
-	var svg = document.createElementNS(svgNS, "svg");
-	svg.setAttribute("width", size);
-	svg.setAttribute("height", size);
-	svg.setAttribute("viewBox", `0 0 ${size} ${size}`);
-
-	draw_sky(svg, size, size);
-
-	var serializer = new XMLSerializer();
-	var svgString = serializer.serializeToString(svg);
-
-	var blob = new Blob([svgString], {
-		type: "image/svg+xml"
-	});
+function download_blob(blob, filename) {
 	var url = URL.createObjectURL(blob);
 	var a = document.createElement("a");
 	a.href = url;
-	a.download = "sky.svg";
+	a.download = filename;
 	document.body.appendChild(a);
 	a.click();
 	document.body.removeChild(a);
+	setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+}
+
+function poster_svg_string() {
+	get_user_obs();
+	return new XMLSerializer().serializeToString(build_poster());
+}
+
+function saveImage() {
+	if (!validateFields()) return;
+	var size = frame_size_cm();
+	var longSide = Math.max(256, resolution || 3000);
+	var w, h;
+	if (size.w >= size.h) {
+		w = longSide;
+		h = Math.round(longSide * size.h / size.w);
+	} else {
+		h = longSide;
+		w = Math.round(longSide * size.w / size.h);
+	}
+	// Respeita o limite de área de canvas dos navegadores móveis
+	if (w * h > MAX_CANVAS_AREA) {
+		var k = Math.sqrt(MAX_CANVAS_AREA / (w * h));
+		w = Math.floor(w * k);
+		h = Math.floor(h * k);
+	}
+
+	var svgUrl = URL.createObjectURL(new Blob([poster_svg_string()], { type: "image/svg+xml" }));
+	var img = new Image();
+	img.onload = function () {
+		var canvas = document.createElement("canvas");
+		canvas.width = w;
+		canvas.height = h;
+		var ctx = canvas.getContext("2d");
+		ctx.drawImage(img, 0, 0, w, h);
+		URL.revokeObjectURL(svgUrl);
+		canvas.toBlob(function (blob) {
+			if (blob) download_blob(blob, poster_filename("png"));
+			else alert("Não foi possível gerar a imagem. Tente uma resolução menor.");
+		}, "image/png");
+	};
+	img.onerror = function () {
+		URL.revokeObjectURL(svgUrl);
+		alert("Não foi possível gerar a imagem.");
+	};
+	img.src = svgUrl;
+}
+
+function saveAsVector() {
+	if (!validateFields()) return;
+	var blob = new Blob([poster_svg_string()], { type: "image/svg+xml" });
+	download_blob(blob, poster_filename("svg"));
 }
 
 function set_user_obs() {
 	// atualiza o formulário com os valores atuais das variáveis globais
-	document.getElementById("resolution").value = planicanvas.width;
+	document.getElementById("resolution").value = resolution;
 
 	document.getElementById("sky_color").value = sky_color;
 	document.getElementById("star_scale").value = star_scale;
@@ -394,23 +597,21 @@ function get_user_obs() {
 	var lon = document.getElementById("user_lon");
 	var lat = document.getElementById("user_lat");
 
-	var n = Date.parse(dt.value);
-	if (isNaN(n)) {
+	// Monta a data no fuso local do navegador. Date.parse("AAAA-MM-DD") usa
+	// meia-noite UTC, o que em fusos negativos (ex.: Brasil) caía no dia anterior.
+	var dp = dt.value.split("-").map(Number);
+	var tp = hr.value.split(":").map(Number);
+	if (dp.length !== 3 || dp.some(isNaN)) {
 		alert("Your browser doesn't think\n'" + dt.value + "'\nis a valid date.");
 		set_user_obs();
 		return;
 	}
-
-	var d = new Date(n);
-	var timeParts = hr.value.split(':');
-	if (timeParts.length === 2) {
-		d.setHours(parseInt(timeParts[0]));
-		d.setMinutes(parseInt(timeParts[1]));
-	} else {
+	if (tp.length < 2 || isNaN(tp[0]) || isNaN(tp[1])) {
 		alert("Invalid time format. Please use HH:MM.");
 		set_user_obs();
 		return;
 	}
+	var d = new Date(dp[0], dp[1] - 1, dp[2], tp[0], tp[1]);
 
 	frame_format = document.getElementById("frame_format").value;
 
@@ -460,11 +661,9 @@ function get_user_obs() {
 	message = document.getElementById("user_message").value;
 	song_link = document.getElementById("user_music").value;
 
-	// resolução do canvas
-	var canvas = document.getElementById("planicanvas");
+	// resolução do PNG (lado maior, em pixels)
 	var res = parseInt(document.getElementById("resolution").value);
-	canvas.width = res;
-	canvas.height = res;
+	if (res >= 256) resolution = res;
 
 	set_user_obs();
 	refresh();
@@ -476,7 +675,7 @@ function canvasApp() {
 	init_planets(planet);
 	now = new Observer();
 	set_user_obs();
-	refresh();
+	get_user_obs(); // aplica a data e o local do formulário já na abertura
 }
 
 function setGeoPos(geopos) {
