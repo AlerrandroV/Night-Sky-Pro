@@ -4,6 +4,12 @@ Gere, direto no navegador, um mapa do céu noturno como ele estava (ou estará) 
 
 O Night Sky Pro é uma versão melhorada do projeto [NightSky](https://github.com/Denisolt/NightSky), de Denisolt, que por sua vez se baseia no planisfério de [Ernie Wright](http://www.etwright.org/astro/plani.html).
 
+## Por que este projeto existe
+
+Muitos sites vendem quadros com o mapa do céu de uma data especial (um nascimento, um casamento, o dia em que duas pessoas se conheceram) a preços abusivos, quando o que eles fazem é basicamente calcular a posição das estrelas e gerar uma imagem.
+
+O Night Sky Pro faz isso de graça. Ele é e sempre será **100% gratuito**, sem cadastro, anúncios ou venda de qualquer tipo. Você gera o arquivo, e a impressão e a montagem do quadro ficam por sua conta: leve o PNG ou o SVG à gráfica que preferir e pague só pela impressão.
+
 ## Funcionalidades
 
 - **Momento e local:** escolha data, hora, latitude e longitude, ou use os botões de hora atual e localização atual (geolocalização do navegador).
@@ -56,4 +62,4 @@ O NightSky original foi distribuído sob a licença *"DO I LOOK LIKE I GIVE A SH
 
 As modificações feitas no Night Sky Pro são distribuídas sob a licença MIT, disponível em [`LICENSE`](LICENSE). Os créditos e avisos de autoria presentes no código original foram mantidos.
 
-O `js/jscolor.js` é um componente de terceiros e segue a sua própria licença (GPLv3 para uso open source; uso comercial requer a licença comercial do jscolor).
+O `js/jscolor.js` é um componente de terceiros e segue a sua própria licença (GPLv3 para projetos open source), que se aplica a este projeto por ele ser gratuito e de código aberto.
