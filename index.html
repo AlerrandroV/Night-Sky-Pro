@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1">
+	<title>NightSky Enhanced</title>
+	<link rel="stylesheet" href="css/plani.css">
+	<script src="js/astro.js"></script>
+	<script src="js/observer.js"></script>
+	<script src="js/skypos.js"></script>
+	<script src="js/skydb.js"></script>
+	<script src="js/plani.js"></script>
+	<script src="js/jscolor.js"></script>
+	<script>
+		window.addEventListener("load", canvasApp, false);
+
+		jscolor.presets.default = {
+			position: 'left',
+			backgroundColor: '#333',
+		};
+	</script>
+</head>
+<body onclick="get_user_obs()">
+
+	<div id="main">
+		<!-- Canvas -->
+		<div id="planicanvas" width="30" height="30"></div>
+
+		<!-- Controls Panel -->
+		<div id="controls">
+
+			<!-- Moment -->
+			<section id="moment">
+				<h4>Moment</h4>
+				<div id="datetime">
+					<input type="text" id="user_date" value="2023-12-21" placeholder="Date"
+					onfocus="(this.type='date')" onblur="(this.type='text')" onchange="get_user_obs()">
+					<input type="text" id="user_time" value="22:31" placeholder="Hour"
+					onfocus="(this.type='time')" onblur="(this.type='text')" onchange="get_user_obs()">
+					<input id="time" type="button" value="Current time" onclick="currentTime()">
+				</div>
+			</section>
+
+			<!-- Location -->
+			<section id="location">
+				<h4>Location</h4>
+				<div id="location-inputs">
+					<input type="number" id="user_lat" value="-1.3529019" placeholder="Latitude (°S)"
+					onfocus="(this.placeholder='Ex.: 90.0000')" onblur="(this.placeholder='Latitude (°S)')"
+					onchange="get_user_obs()">
+					<input type="number" id="user_lon" value="-48.3882851" placeholder="Longitude (°W)"
+					onfocus="(this.placeholder='Ex.: 180.0000')" onblur="(this.placeholder='Longitude (°W)')"
+					onchange="get_user_obs()">
+					<input id="geoloc" type="button" value="Current location" onclick="getGeoPos()">
+				</div>
+			</section>
+
+			<!-- Basic Settings -->
+			<section id="settings">
+				<h4>Settings</h4>
+
+				<div class="set-item">
+					Deep Space Objects (DSOs)
+					<label class="switch">
+						<input id="user_dsos" type="checkbox" onchange="get_user_obs()">
+						<span class="slider"></span>
+					</label>
+				</div>
+
+				<div class="set-item">
+					Star Names
+					<label class="switch">
+						<input id="user_starlab" type="checkbox" onchange="get_user_obs()">
+						<span class="slider"></span>
+					</label>
+				</div>
+
+				<div class="set-item">
+					Constellation Lines
+					<label class="switch">
+						<input id="user_conline" type="checkbox" onchange="get_user_obs()">
+						<span class="slider"></span>
+					</label>
+				</div>
+
+				<div class="set-item">
+					Constellation Names
+					<label class="switch">
+						<input id="user_conlab" type="checkbox" onchange="get_user_obs()">
+						<span class="slider"></span>
+					</label>
+				</div>
+
+				<div class="set-item">
+					Show Coordinates
+					<label class="switch">
+						<input id="show_coordinates" type="checkbox" onchange="get_user_obs()">
+						<span class="slider"></span>
+					</label>
+				</div>
+
+				<div class="set-item">
+					Show Date
+					<label class="switch">
+						<input id="show_date" type="checkbox" onchange="get_user_obs()">
+						<span class="slider"></span>
+					</label>
+				</div>
+
+				<div class="set-item">
+					Show Time
+					<label class="switch">
+						<input id="show_time" type="checkbox" onchange="get_user_obs()">
+						<span class="slider"></span>
+					</label>
+				</div>
+
+				<div class="set-item">
+					Message (optional)
+					<input id="user_message" type="text" placeholder="Enter message..." onchange="get_user_obs()">
+				</div>
+
+				<div class="set-item">
+					Music (opcional)
+					<input id="user_music" type="text" placeholder="Music URL" onchange="get_user_obs()">
+				</div>
+
+				<div class="set-item">
+					<label for="frame_format">Formato do quadro:</label>
+					<select id="frame_format">
+						<option value="A4">A4 (21 x 29,7 cm)</option>
+						<option value="A3">A3 (29,7 x 42 cm)</option>
+						<option value="A2">A2 (42 x 59,4 cm)</option>
+						<option value="15x15">15 x 15 cm</option>
+						<option value="30x40">30 x 40 cm</option>
+						<option value="40x50">40 x 50 cm</option>
+						<option value="50x70">50 x 70 cm</option>
+						<option value="60x90">60 x 90 cm</option>
+						<option value="custom">Personalizado</option>
+					</select>
+					<div id="custom_size" style="display:none; margin-top:5px;">
+						<input type="number" id="custom_width" placeholder="Largura (cm)" min="5">
+						<input type="number" id="custom_height" placeholder="Altura (cm)" min="5">
+					</div>
+				</div>
+
+			</section>
+
+			<!-- Advanced Settings -->
+			<section id="advanced-settings">
+				<h4>Other Settings</h4>
+
+				<!-- Resolution -->
+				<div class="set-item">
+					Resolution
+					<input id="resolution" type="number" value="1600" onchange="get_user_obs()">
+				</div>
+
+				<!-- Sky Color -->
+				<div class="set-item">
+					Sky Color
+					<input id="sky_color" data-jscolor="{}" value="#102" onchange="get_user_obs()">
+				</div>
+
+				<!-- Star Settings -->
+				<div class="set-item">
+					Star Scale
+					<input id="star_scale" type="number" value="1.5" step="0.1" onchange="get_user_obs()">
+				</div>
+				<div class="set-item">
+					Star Color
+					<input id="star_color" data-jscolor="{}" value="#ffffff" onchange="get_user_obs()">
+				</div>
+				<div class="set-item">
+					Star Label Size
+					<input id="starLabel_size" type="number" value="10" onchange="get_user_obs()">
+				</div>
+				<div class="set-item">
+					Star Label Color
+					<input id="starLabel_color" data-jscolor="{}" value="#cccccc" onchange="get_user_obs()">
+				</div>
+
+				<!-- Planet Settings -->
+				<div class="set-item">
+					Planet Label Size
+					<input id="planetLabel_size" type="number" value="10" onchange="get_user_obs()">
+				</div>
+				<div class="set-item">
+					Star Label Color
+					<input id="Label_color" data-jscolor="{}" value="#cccccc" onchange="get_user_obs()">
+				</div>
+
+				<hr>
+
+				<!-- Constellation Settings -->
+				<div class="set-item">
+					Constellation Line Scale
+					<input id="conLine_scale" type="number" value="1" step="0.1" onchange="get_user_obs()">
+				</div>
+				<div class="set-item">
+					Constellation Line Color
+					<input id="conLine_color" data-jscolor="{}" value="#888888" onchange="get_user_obs()">
+				</div>
+				<div class="set-item">
+					Constellation Label Size
+					<input id="conLabel_size" type="number" value="10" onchange="get_user_obs()">
+				</div>
+				<div class="set-item">
+					Constellation Label Color
+					<input id="conLabel_color" data-jscolor="{}" value="#cccccc" onchange="get_user_obs()">
+				</div>
+
+				<hr>
+
+				<!-- DSOs Labels -->
+				<div class="set-item">
+					DSOs Label Size
+					<input id="dsoLabel_size" type="number" value="10" onchange="get_user_obs()">
+				</div>
+				<div class="set-item">
+					DSOs Label Color
+					<input id="dsoLabel_color" data-jscolor="{}" value="#cccccc" onchange="get_user_obs()">
+				</div>
+
+			</section>
+
+		</div>
+
+		<!-- Action Buttons fixos -->
+		<section id="actions">
+			<div id="btn-save-image" onclick="saveImage()">
+				SAVE IMAGE
+			</div>
+			<div id="btn-save-vector" onclick="saveAsVector()">
+				SAVE VECTOR
+			</div>
+		</section>
+
+	</div>
+
+</body>
+</html>

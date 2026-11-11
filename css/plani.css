@@ -1,0 +1,227 @@
+/* Reset básico */
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Body */
+body {
+	background-color: #f0f0f3;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 10px;
+	height: 100vh;
+	overflow: hidden;
+}
+
+/* Container principal com gap entre blocos */
+#main {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: 100%;
+	gap: 10px;
+}
+
+/* Canvas */
+#planicanvas {
+	background-color: #1e1e2a;
+	width: 100%;
+	height: min(35vh, 250px); /* canvas responsivo */
+	border-radius: 8px;
+	box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+	border: 1px solid #444;
+	flex-shrink: 0;
+	display: flex;
+}
+
+#planicanvas svg {
+	height: 95%;
+	margin: auto;
+}
+
+/* Painel de controles */
+#controls {
+	background-color: #ffffff;
+	flex: 1; /* ocupa o espaço restante */
+	width: 100%;
+	border-radius: 8px;
+	padding: 16px;
+	box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	scrollbar-width: thin;
+	scrollbar-color: #ccc #f0f0f3;
+}
+
+/* Sections dentro do painel */
+#controls section {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+/* Titles das sections */
+#controls h4 {
+	color: #222;
+	font-weight: 500;
+	margin-bottom: 8px;
+	font-size: 16px;
+	border-bottom: 1px solid #ddd;
+	padding-bottom: 4px;
+}
+
+/* Agrupamento de inputs */
+#datetime,
+#location-inputs,
+.set-item {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 5px;
+}
+
+/* Inputs e buttons */
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+[data-jscolor],
+select {
+	background-color: #fff;
+	color: #000;
+	border: 1px solid #ccc;
+	padding: 8px 12px;
+	border-radius: 8px;
+	font-size: 14px;
+	max-width: 40%;
+}
+
+input[type="button"] {
+	background-color: #6200ee;
+	width: 100%;
+	color: #fff;
+	border: none;
+	padding: 10px 12px;
+	border-radius: 8px;
+	cursor: pointer;
+	font-weight: 500;
+	transition: background 0.2s ease;
+}
+
+input[type="button"]:hover {
+	background-color: #3700b3;
+}
+
+/* Set-items (switches e labels) */
+.set-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 4px 0;
+}
+
+/* Switch toggle */
+.switch {
+	position: relative;
+	display: inline-block;
+	width: 50px;
+	height: 28px;
+}
+
+.switch input {
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+.slider {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: #ccc;
+	transition: .4s;
+	border-radius: 8px;
+}
+
+.slider:before {
+	position: absolute;
+	content: "";
+	height: 22px;
+	width: 22px;
+	left: 3px;
+	bottom: 3px;
+	background-color: #fff;
+	transition: .4s;
+	border-radius: 6px;
+}
+
+input:checked + .slider {
+	background-color: #6200ee;
+}
+
+input:checked + .slider:before {
+	transform: translateX(22px);
+}
+
+/* Bloco de ações */
+#actions {
+	background-color: #ffffff;
+	width: 100%;
+	padding: 12px;
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+	display: flex;
+	justify-content: center;
+	gap: 10px;
+}
+
+#btn-save-image,
+#btn-save-vector {
+	background-color: #6200ee;
+	color: #fff;
+	padding: 10px 16px;
+	border-radius: 8px;
+	cursor: pointer;
+	font-weight: 500;
+	width: 50%;
+	transition: background 0.2s ease;
+}
+
+#btn-save-image:hover,
+#btn-save-vector:hover {
+	background-color: #3700b3;
+}
+
+/* Scrollbar customizada para Webkit */
+#controls::-webkit-scrollbar {
+	width: 5px;
+}
+
+#controls::-webkit-scrollbar-track {
+	background: #f0f0f3;
+	border-radius: 28px;
+}
+
+#controls::-webkit-scrollbar-thumb {
+	background: #ccc;
+	border-radius: 28px;
+}
+
+#controls::-webkit-scrollbar-thumb:hover {
+	background: #999;
+}
+
+#datetime input[type="text"],
+#location-inputs input[type="number"],
+#custom-size input {
+	background: #fff;
+	min-width: calc(50% - 5px / 2);
+}
