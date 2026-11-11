@@ -1,64 +1,59 @@
-# Night Sky
+# Night Sky Pro
 
----
-**NOTE**
+Gere, direto no navegador, um mapa do céu noturno como ele estava (ou estará) em uma data, hora e local específicos, e exporte o resultado como imagem ou vetor para imprimir em um quadro ou pôster.
 
-As you probably realized from comments in code, the majority of this code was written by Ernie Wright  (http://www.etwright.org/astro/plani.html). Me being young and foolish at the moment of putting this repo together, I have forgotten to give him shoutout. So, Ernie, if you are seeing this: I am sorry 😐 and thanks for the code. 
+O Night Sky Pro é uma versão melhorada do projeto [NightSky](https://github.com/Denisolt/NightSky), de Denisolt, que por sua vez se baseia no planisfério de [Ernie Wright](http://www.etwright.org/astro/plani.html).
 
----
+## Funcionalidades
 
-A way to avoid paying 50 bucks by using some js to generate an image of the night sky at specific time at a specific location. 
+- **Momento e local:** escolha data, hora, latitude e longitude, ou use os botões de hora atual e localização atual (geolocalização do navegador).
+- **Objetos do céu:** estrelas, planetas, Lua, linhas e nomes de constelações, nomes de estrelas e objetos de céu profundo (DSOs), cada um podendo ser ligado ou desligado.
+- **Personalização visual:** cor do céu, cor e escala das estrelas, cor e tamanho de cada tipo de rótulo, cor e espessura das linhas de constelação.
+- **Informações no pôster:** coordenadas, data, hora e uma mensagem personalizada, todas opcionais.
+- **Formatos de quadro:** A4, A3, A2, 15×15, 30×40, 40×50, 50×70, 60×90 cm ou tamanho personalizado.
+- **Exportação:** salve como imagem (PNG) em resolução configurável ou como vetor (SVG).
 
-I hope someone finds this useful.
+## Como usar
 
-## Problem
-
-There are websites like thenightsky.com that offer posters with the view of the night sky. Example is below: 
-
-There is only one problem and that is the cost. a poster like this will end up being around 40-50 bucks.
-
-![img](https://cdn.shopify.com/s/files/1/2160/9077/files/gallery3_1296x.jpg?v=1506954695)
-
-## Solution
-
-Some open source work, a little bit of js and call it a day. Made my own version. Bless up, not paying 50 bucks for a poster. 
-
-
-
-## Deployment
+Não precisa de instalação nem de build: é HTML, CSS e JavaScript puro.
 
 ```bash
-git clone https://github.com/Denisolt/NightSky
-cd NightSky
-open the index file
+git clone https://github.com/AlerrandroV/Night-Sky-Pro.git
+cd Night-Sky-Pro
 ```
 
-too easy to even explain, fam.
+Depois abra o `index.html` no navegador. Para que o botão de localização atual funcione, alguns navegadores exigem que a página seja servida por HTTP, por exemplo:
 
-## Result:
+```bash
+python3 -m http.server 8000
+# acesse http://localhost:8000
+```
 
-![sample](https://github.com/Denisolt/NightSky/blob/master/sample.png?raw=true)
-
-## License
-
-The project is under `DO I LOOK LIKE I GIVE A SHIT PUBLIC LICENSE`
-
-Do whatever you want. 
+## Estrutura
 
 ```
-	    DO I LOOK LIKE I GIVE A SHIT PUBLIC LICENSE 
-                      Version 1, June 2018
-  
-  Copyright (C) 2013 Denisolt <denisolt@gmail.com> 
-
-  Everyone is permitted to copy and distribute verbatim or modified 
-  copies of this license document, and changing it is allowed as long 
-  as the name is changed. 
-
-             DO I LOOK LIKE I GIVE A SHIT PUBLIC LICENSE 
-    TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION 
-  
-   0. I don't give a shit what you do, just don't bother me with it.
-
-   1. I'm done with this shit, maintain it yourself.
+index.html       Página principal e painel de controles
+css/             Estilos da interface
+js/astro.js      Funções astronômicas base (Ernie Wright)
+js/observer.js   Observador: data, hora e posição (Ernie Wright)
+js/skypos.js     Posições de Sol, Lua e planetas (Ernie Wright)
+js/skydb.js      Catálogo de estrelas, constelações e DSOs (Ernie Wright)
+js/plani.js      Desenho do céu, controles e exportação
+js/jscolor.js    Seletor de cores (jscolor)
 ```
+
+## Créditos
+
+- **Ernie Wright**: autor dos cálculos astronômicos, do catálogo de objetos e do planisfério original em que todo o projeto se baseia ([etwright.org/astro/plani.html](http://www.etwright.org/astro/plani.html)).
+- **Denisolt**: autor do [NightSky](https://github.com/Denisolt/NightSky), projeto que adaptou o planisfério para gerar pôsteres do céu noturno e que serviu de ponto de partida para este.
+- **Jan Odvarko (East Desire)**: autor do [jscolor](https://jscolor.com), biblioteca usada no seletor de cores.
+
+Muito obrigado a eles pelo trabalho aberto.
+
+## Licença
+
+O NightSky original foi distribuído sob a licença *"DO I LOOK LIKE I GIVE A SHIT PUBLIC LICENSE"*, que permite copiar, modificar e redistribuir o código, desde que o nome do projeto seja alterado. O texto completo está em [`LICENSE.original`](LICENSE.original).
+
+As modificações feitas no Night Sky Pro são distribuídas sob a licença MIT, disponível em [`LICENSE`](LICENSE). Os créditos e avisos de autoria presentes no código original foram mantidos.
+
+O `js/jscolor.js` é um componente de terceiros e segue a sua própria licença (GPLv3 para uso open source; uso comercial requer a licença comercial do jscolor).
