@@ -59,6 +59,8 @@ var ck_time = true;
 var ck_coordinates = true;
 var text_color = "#ffffff";
 var text_scale = 1;
+var msg_font = "inter";       // fonte da mensagem (id de FONT_PRESETS ou "custom")
+var det_font = "inter";       // fonte da data, hora e coordenadas
 
 // Código do Spotify (o "código de barras" que o app do Spotify escaneia)
 var ck_spotify = true;
@@ -517,16 +519,14 @@ function svg_el(name, attrs) {
 	return el;
 }
 
-// Quebra o texto em linhas que caibam em maxWidth (medido com canvas)
-function wrap_text(text, fontSize, maxWidth) {
-	var ctx = document.createElement("canvas").getContext("2d");
-	ctx.font = fontSize + "px " + POSTER_FONT;
+// Quebra o texto em linhas que caibam em maxWidth, medidas com a fonte escolhida
+function wrap_text(text, fontSize, maxWidth, fontId) {
 	var words = text.split(/\s+/).filter(Boolean);
 	var lines = [];
 	var line = "";
 	for (var i = 0; i < words.length; i++) {
 		var test = line ? line + " " + words[i] : words[i];
-		if (line && ctx.measureText(test).width > maxWidth) {
+		if (line && measure_text(test, fontSize, fontId) > maxWidth) {
 			lines.push(line);
 			line = words[i];
 		} else {
@@ -604,7 +604,7 @@ function build_poster() {
 	// Demais formatos: céu em cima e texto embaixo.
 	var landscape = W > H * 1.15;
 	var textW = landscape ? W - 2 * margin - (H - 2 * margin) - gap : W - 2 * margin;
-	var msgLines = texts.message ? wrap_text(texts.message, msgSize, textW) : [];
+	var msgLines = texts.message ? wrap_text(texts.message, msgSize, textW, msg_font) : [];
 	var textH = 0;
 	if (msgLines.length) textH += msgLines.length * msgSize * 1.25;
 	if (texts.details.length) textH += (msgLines.length ? detSize : 0) + texts.details.length * detSize * 1.6;
@@ -667,24 +667,19 @@ function build_poster() {
 	var y = textY;
 	for (var i = 0; i < msgLines.length; i++) {
 		y += msgSize;
-		var t = svg_el("text", {
-			x: textX, y: y, "text-anchor": "middle", fill: text_color,
-			"font-size": msgSize, "font-family": POSTER_FONT, "font-weight": 300
-		});
-		t.textContent = msgLines[i];
-		svg.appendChild(t);
+		svg.appendChild(poster_text(msgLines[i], {
+			x: textX, y: y, size: msgSize, anchor: "middle",
+			fill: text_color, fontId: msg_font
+		}));
 		y += msgSize * 0.25;
 	}
 	if (msgLines.length && texts.details.length) y += detSize;
 	for (var j = 0; j < texts.details.length; j++) {
 		y += detSize * 1.6;
-		var d = svg_el("text", {
-			x: textX, y: y, "text-anchor": "middle", fill: text_color,
-			"fill-opacity": 0.75, "font-size": detSize, "font-family": POSTER_FONT,
-			"letter-spacing": detSize * 0.08
-		});
-		d.textContent = texts.details[j];
-		svg.appendChild(d);
+		svg.appendChild(poster_text(texts.details[j], {
+			x: textX, y: y, size: detSize, anchor: "middle",
+			fill: text_color, opacity: 0.75, spacing: detSize * 0.08, fontId: det_font
+		}));
 	}
 
 	if (code) {
@@ -893,6 +888,10 @@ function poster_svg_string() {
 
 function saveImage() {
 	if (!validateFields()) return;
+	ensure_poster_fonts().then(save_image_now);
+}
+
+function save_image_now() {
 	var size = frame_size_cm();
 	var longSide = Math.max(256, resolution || 3000);
 	var w, h;
@@ -933,6 +932,10 @@ function saveImage() {
 
 function saveAsVector() {
 	if (!validateFields()) return;
+	ensure_poster_fonts().then(save_vector_now);
+}
+
+function save_vector_now() {
 	var blob = new Blob([poster_svg_string()], { type: "image/svg+xml" });
 	download_blob(blob, poster_filename("svg"));
 }
@@ -994,6 +997,8 @@ var SETTINGS = [
 	["show_coordinates", "ck_coordinates", "bool"],
 	["text_color", "text_color", "color"],
 	["text_scale", "text_scale", "float"],
+	["msg_font", "msg_font", "text"],
+	["det_font", "det_font", "text"],
 
 	["show_spotify", "ck_spotify", "bool"],
 	["user_music", "song_link", "text"],
@@ -1035,6 +1040,9 @@ function read_settings() {
 		window[st[1]] = v;
 	});
 	if (resolution < 256) resolution = 256;
+	// Seletor de fonte vazio ou apontando para uma personalizada que não existe
+	if (!msg_font || (msg_font === CUSTOM_FONT_ID && !custom_font)) msg_font = "inter";
+	if (!det_font || (det_font === CUSTOM_FONT_ID && !custom_font)) det_font = "inter";
 }
 
 // Mostra só as opções que fazem efeito: um item com data-show-if="a b"
@@ -1096,6 +1104,7 @@ function canvasApp() {
 	init_dsos(dso);
 	init_planets(planet);
 	now = new Observer();
+	update_font_selects();
 	set_user_obs();
 	get_user_obs(); // aplica a data e o local do formulário já na abertura
 

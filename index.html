@@ -9,6 +9,9 @@
 	<script src="js/observer.js"></script>
 	<script src="js/skypos.js"></script>
 	<script src="js/skydb.js"></script>
+	<script src="js/lib/opentype.min.js"></script>
+	<script src="js/lib/jszip.min.js"></script>
+	<script src="js/fonts.js"></script>
 	<script src="js/plani.js"></script>
 	<script src="js/jscolor.js"></script>
 	<script>
@@ -290,6 +293,36 @@
 					Tamanho dos textos
 					<input id="text_scale" type="number" min="0.1" step="0.1">
 				</div>
+			</details>
+
+			<details class="group">
+				<summary>Fontes</summary>
+				<div class="set-item">
+					Mensagem
+					<select id="msg_font"></select>
+				</div>
+				<div class="set-item">
+					Data, hora e coordenadas
+					<select id="det_font"></select>
+				</div>
+				<hr>
+				<div class="set-item">
+					Fonte personalizada
+					<label class="file-button">
+						Importar arquivo
+						<input id="font_file" type="file" accept=".ttf,.otf,.woff,.zip" onchange="load_font_file(this)">
+					</label>
+				</div>
+				<p class="hint">
+					Não gostou de nenhuma fonte? Quem sabe você não encontra a fonte ideal no
+					<a href="https://www.dafont.com" target="_blank" rel="noopener">dafont</a>?
+					Copie o link da fonte desejada e cole logo abaixo.
+				</p>
+				<div class="paste-row">
+					<input id="dafont_link" type="url" placeholder="https://www.dafont.com/nome-da-fonte.font" onchange="load_dafont_link()">
+					<button id="dafont_paste" type="button" onclick="paste_dafont_link()">Colar</button>
+				</div>
+				<p id="font_status" class="status"></p>
 			</details>
 
 			<details class="group">
