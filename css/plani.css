@@ -433,3 +433,64 @@ details.group hr {
 	text-decoration: underline;
 	cursor: pointer;
 }
+
+/* Fontes: importar arquivo, dica do dafont e campo com botão "Colar" */
+.file-button {
+	position: relative;
+	overflow: hidden;
+	background-color: #6200ee;
+	color: #fff;
+	padding: 8px 12px;
+	border-radius: 8px;
+	font-size: 14px;
+	cursor: pointer;
+}
+
+.file-button input[type="file"] {
+	position: absolute;
+	inset: 0;
+	opacity: 0;
+	cursor: pointer;
+}
+
+.hint {
+	font-size: 13px;
+	color: #555;
+	line-height: 1.45;
+	margin: 8px 0 6px;
+}
+
+.hint a {
+	color: #6200ee;
+}
+
+.paste-row {
+	display: flex;
+	gap: 6px;
+}
+
+.paste-row input {
+	flex: 1;
+	min-width: 0;
+	max-width: none !important;
+	background-color: #fff;
+	color: #000;
+	border: 1px solid #ccc;
+	padding: 8px 12px;
+	border-radius: 8px;
+	font-size: 14px;
+}
+
+.paste-row button {
+	background-color: #6200ee;
+	color: #fff;
+	border: none;
+	padding: 8px 16px;
+	border-radius: 8px;
+	font-size: 14px;
+	cursor: pointer;
+}
+
+#font_status:empty {
+	display: none;
+}

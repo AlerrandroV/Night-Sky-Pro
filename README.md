@@ -18,6 +18,7 @@ O Night Sky Pro faz isso de graça. Ele é e sempre será **100% gratuito**, sem
 - **Moldura:** um retângulo perto das bordas do quadro e o contorno do céu, com cor e espessura ajustáveis.
 - **Textos no pôster:** mensagem, data, hora e coordenadas, com cor e tamanho ajustáveis.
 - **Código do Spotify:** cole o link de uma música, álbum, playlist ou podcast e o quadro ganha o código escaneável pelo app do Spotify, com cor e tamanho ajustáveis. O código é baixado do serviço do próprio Spotify (`scannables.scdn.co`), então precisa de internet.
+- **Fontes:** 10 fontes prontas para a mensagem e para os detalhes (data, hora e coordenadas), ou qualquer outra importada de um arquivo (TTF, OTF, WOFF ou o .zip do dafont) ou pelo link de uma fonte do [dafont](https://www.dafont.com). Os textos viram contornos, então a fonte vai embutida no PNG e no SVG.
 - **Formatos de quadro:** A4, A3, A2, 15×15, 30×40, 40×50, 50×70, 60×90 cm ou tamanho personalizado, com cor de fundo própria.
 - **Exportação:** PNG em resolução configurável ou SVG vetorial, já com o tamanho físico do quadro em cm.
 
@@ -30,7 +31,7 @@ git clone https://github.com/AlerrandroV/Night-Sky-Pro.git
 cd Night-Sky-Pro
 ```
 
-Depois abra o `index.html` no navegador. Para que o botão de localização atual funcione, alguns navegadores exigem que a página seja servida por HTTP, por exemplo:
+Depois sirva a pasta por HTTP e abra no navegador. Abrindo o `index.html` direto do computador (`file://`), o navegador bloqueia o carregamento das fontes e, em alguns casos, a localização atual. Um servidor local resolve:
 
 ```bash
 python3 -m http.server 8000
@@ -46,8 +47,11 @@ js/astro.js      Funções astronômicas base (Ernie Wright)
 js/observer.js   Observador: data, hora e posição (Ernie Wright)
 js/skypos.js     Posições de Sol, Lua e planetas (Ernie Wright)
 js/skydb.js      Catálogo de estrelas, constelações e DSOs (Ernie Wright)
-js/plani.js      Desenho do céu, controles e exportação
+js/plani.js      Desenho do céu, pôster, controles e exportação
+js/fonts.js      Fontes: pré-programadas, importadas e do dafont
 js/jscolor.js    Seletor de cores (jscolor)
+js/lib/          opentype.js (texto em contornos) e JSZip (abrir .zip)
+fonts/           Fontes pré-programadas (WOFF) e suas licenças
 ```
 
 ## Créditos
@@ -55,6 +59,9 @@ js/jscolor.js    Seletor de cores (jscolor)
 - **Ernie Wright**: autor dos cálculos astronômicos, do catálogo de objetos e do planisfério original em que todo o projeto se baseia ([etwright.org/astro/plani.html](http://www.etwright.org/astro/plani.html)).
 - **Denisolt**: autor do [NightSky](https://github.com/Denisolt/NightSky), projeto que adaptou o planisfério para gerar pôsteres do céu noturno e que serviu de ponto de partida para este.
 - **Jan Odvarko (East Desire)**: autor do [jscolor](https://jscolor.com), biblioteca usada no seletor de cores.
+- **[opentype.js](https://opentype.js.org)** (MIT): converte os textos do pôster em contornos.
+- **[JSZip](https://stuk.github.io/jszip/)** (MIT): abre os arquivos .zip de fontes.
+- **Fontes** Inter, Montserrat, Josefin Sans, Playfair Display, Cormorant Garamond, Cinzel, Great Vibes, Dancing Script, Pacifico e Caveat, todas sob a [SIL Open Font License](https://openfontlicense.org), obtidas pelo [Fontsource](https://fontsource.org). As licenças estão em `fonts/licenses/`.
 
 Muito obrigado a eles pelo trabalho aberto.
 
