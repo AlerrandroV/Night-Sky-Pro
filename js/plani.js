@@ -6,6 +6,8 @@ var ck_conlines = false;
 var ck_coordinates = true;
 var ck_date = true;
 var ck_time = true;
+var ck_border = true;        // moldura retangular e contorno do céu
+var border_color = "#ffffff"; // cor comum aos dois perímetros
 
 var sky_color = "#102";
 var star_color = "#fff";
@@ -393,6 +395,17 @@ function build_poster() {
 
 	// Tamanhos proporcionais ao lado menor, para valer em qualquer formato
 	var unit = Math.min(W, H);
+	var lineWidth = 0.0025 * unit; // espessura da moldura e do contorno do céu
+
+	// Moldura: retângulo a uma pequena distância das bordas do quadro.
+	// Fica dentro da margem do conteúdo, então não encosta no céu nem no texto.
+	if (ck_border) {
+		var inset = 0.035 * unit;
+		svg.appendChild(svg_el("rect", {
+			x: inset, y: inset, width: W - 2 * inset, height: H - 2 * inset,
+			fill: "none", stroke: border_color, "stroke-width": lineWidth
+		}));
+	}
 	var texts = poster_texts();
 	var msgSize = 0.045 * unit;
 	var detSize = 0.024 * unit;
@@ -441,10 +454,15 @@ function build_poster() {
 	var skyGroup = svg_el("g", { "clip-path": "url(#" + clipId + ")" });
 	draw_sky_into(sky, skyGroup);
 	sky.appendChild(skyGroup);
-	sky.appendChild(svg_el("circle", {
-		cx: SKY_SIZE / 2, cy: SKY_SIZE / 2, r: SKY_SIZE / 2 - 1,
-		fill: "none", stroke: star_color, "stroke-opacity": 0.35, "stroke-width": 2
-	}));
+	// Contorno com a mesma espessura da moldura, convertida para as unidades
+	// do céu (o svg do céu é escalado de SKY_SIZE para diameter).
+	if (ck_border && diameter) {
+		var skyLine = lineWidth * SKY_SIZE / diameter;
+		sky.appendChild(svg_el("circle", {
+			cx: SKY_SIZE / 2, cy: SKY_SIZE / 2, r: SKY_SIZE / 2 - skyLine / 2,
+			fill: "none", stroke: border_color, "stroke-width": skyLine
+		}));
+	}
 	svg.appendChild(sky);
 
 	// Textos
@@ -605,6 +623,7 @@ function set_user_obs() {
 	document.getElementById("show_coordinates").checked = ck_coordinates;
 	document.getElementById("show_date").checked = ck_date;
 	document.getElementById("show_time").checked = ck_time;
+	document.getElementById("show_border").checked = ck_border;
 
 	document.getElementById("user_message").value = message;
 	document.getElementById("user_music").value = song_link;
@@ -663,6 +682,7 @@ function get_user_obs() {
 	ck_coordinates = document.getElementById("show_coordinates").checked;
 	ck_date = document.getElementById("show_date").checked;
 	ck_time = document.getElementById("show_time").checked;
+	ck_border = document.getElementById("show_border").checked;
 
 	// cores, escalas e tamanhos
 	sky_color = document.getElementById("sky_color").value;
