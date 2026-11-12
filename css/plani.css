@@ -44,7 +44,10 @@ body {
 
 #planicanvas svg {
 	height: 95%;
+	width: auto;
+	max-width: 95%;
 	margin: auto;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.5);
 }
 
 /* Painel de controles */
@@ -227,7 +230,13 @@ input:checked + .slider:before {
 
 #datetime input[type="text"],
 #location-inputs input[type="number"],
-#custom-size input {
+#custom_size input {
 	background: #fff;
 	min-width: calc(50% - 5px / 2);
+}
+
+#custom_size {
+	width: 100%;
+	gap: 5px;
+	margin-top: 5px;
 }
