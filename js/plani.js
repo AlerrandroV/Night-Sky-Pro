@@ -45,9 +45,11 @@ var dsoLabel_size = 5;
 var ck_grid = false;
 var grid_color = "#ffffff";
 var grid_scale = 1;
+var grid_opacity = 30;        // opacidade das linhas, em %
 var ck_gridlabels = true;
 var gridLabel_color = "#ffffff";
 var gridLabel_size = 10;
+var gridLabel_opacity = 60;   // opacidade dos rótulos, em %
 
 // Textos
 var message = "The best night of our lives";
@@ -319,7 +321,7 @@ function draw_grid(svg, w, h) {
 	path.setAttribute("d", d);
 	path.setAttribute("fill", "none");
 	path.setAttribute("stroke", grid_color);
-	path.setAttribute("stroke-opacity", 0.3);
+	path.setAttribute("stroke-opacity", grid_opacity / 100);
 	path.setAttribute("stroke-width", w / 1000 * grid_scale);
 	svg.appendChild(path);
 
@@ -343,7 +345,7 @@ function draw_grid_labels(svg, w, h) {
 		t.setAttribute("x", p[0] + dx);
 		t.setAttribute("y", p[1] + dy);
 		t.setAttribute("fill", gridLabel_color);
-		t.setAttribute("fill-opacity", 0.6);
+		t.setAttribute("fill-opacity", gridLabel_opacity / 100);
 		t.setAttribute("font-size", size);
 		t.setAttribute("text-anchor", anchor);
 		t.textContent = text;
@@ -774,7 +776,7 @@ function saveAsVector() {
 }
 
 // Tabela de configurações: [id do campo, variável global, tipo].
-// Tipos: "bool" (interruptor), "color", "float", "int", "text".
+// Tipos: "bool" (interruptor), "color", "float", "int", "percent" (0 a 100), "text".
 var SETTINGS = [
 	["bg_color", "bg_color", "color"],
 	["resolution", "resolution", "int"],
@@ -817,9 +819,11 @@ var SETTINGS = [
 	["show_grid", "ck_grid", "bool"],
 	["grid_color", "grid_color", "color"],
 	["grid_scale", "grid_scale", "float"],
+	["grid_opacity", "grid_opacity", "percent"],
 	["show_gridlab", "ck_gridlabels", "bool"],
 	["gridLabel_color", "gridLabel_color", "color"],
 	["gridLabel_size", "gridLabel_size", "int"],
+	["gridLabel_opacity", "gridLabel_opacity", "percent"],
 
 	["user_message", "message", "text"],
 	["show_date", "ck_date", "bool"],
@@ -857,6 +861,7 @@ function read_settings() {
 			case "bool": v = el.checked; break;
 			case "float": v = parseFloat(el.value); if (!(v > 0)) return; break;
 			case "int": v = parseInt(el.value, 10); if (!(v > 0)) return; break;
+			case "percent": v = parseFloat(el.value); if (!(v >= 0 && v <= 100)) return; break;
 			case "color": v = el.value.trim(); if (!v) return; if (v[0] !== "#") v = "#" + v; break;
 			default: v = el.value;
 		}

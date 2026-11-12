@@ -239,6 +239,10 @@
 					<input id="grid_scale" type="number" min="0.1" step="0.1">
 				</div>
 				<div class="set-item" data-show-if="show_grid">
+					Opacidade das linhas (%)
+					<input id="grid_opacity" type="number" min="0" max="100" step="5">
+				</div>
+				<div class="set-item" data-show-if="show_grid">
 					Rótulos (horas e declinações)
 					<label class="switch"><input id="show_gridlab" type="checkbox"><span class="slider"></span></label>
 				</div>
@@ -249,6 +253,10 @@
 				<div class="set-item" data-show-if="show_grid show_gridlab">
 					Tamanho dos rótulos
 					<input id="gridLabel_size" type="number" min="1" step="1">
+				</div>
+				<div class="set-item" data-show-if="show_grid show_gridlab">
+					Opacidade dos rótulos (%)
+					<input id="gridLabel_opacity" type="number" min="0" max="100" step="5">
 				</div>
 			</details>
 
