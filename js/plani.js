@@ -57,6 +57,8 @@ var message = "The best night of our lives";
 var ck_date = true;
 var ck_time = true;
 var ck_coordinates = true;
+var ck_place = true;          // nome do local (só aparece se houver um nome)
+var place_name = "";
 var text_color = "#ffffff";
 var text_scale = 1;
 var msg_font = "inter";       // fonte da mensagem (id de FONT_PRESETS ou "custom")
@@ -544,6 +546,7 @@ function format_coord(value, pos, neg) {
 
 function poster_texts() {
 	var texts = { message: message.trim(), details: [] };
+	if (ck_place && place_name.trim()) texts.details.push(place_name.trim());
 	var dt = document.getElementById("user_date").value;
 	var hr = document.getElementById("user_time").value;
 	var lat = document.getElementById("user_lat").value;
@@ -995,6 +998,8 @@ var SETTINGS = [
 	["show_date", "ck_date", "bool"],
 	["show_time", "ck_time", "bool"],
 	["show_coordinates", "ck_coordinates", "bool"],
+	["show_place", "ck_place", "bool"],
+	["place_name", "place_name", "text"],
 	["text_color", "text_color", "color"],
 	["text_scale", "text_scale", "float"],
 	["msg_font", "msg_font", "text"],
@@ -1111,6 +1116,12 @@ function canvasApp() {
 	// Qualquer mudança no painel atualiza o pôster
 	document.getElementById("controls").addEventListener("change", function (e) {
 		if (e.target.id === "frame_format") toggleCustomSize();
+		if (e.target.id === "place_search") return; // a busca aplica o local ao escolher uma sugestão
+		// Coordenadas digitadas à mão: o nome do local anterior deixa de valer
+		if (e.target.id === "user_lat" || e.target.id === "user_lon") {
+			document.getElementById("place_name").value = "";
+			document.getElementById("place_search").value = "";
+		}
 		update_visibility();
 		get_user_obs();
 	});
@@ -1119,18 +1130,20 @@ function canvasApp() {
 function setGeoPos(geopos) {
 	document.getElementById("user_lat").value = geopos.coords.latitude;
 	document.getElementById("user_lon").value = geopos.coords.longitude;
+	document.getElementById("place_search").value = "";
 	get_user_obs();
+	fill_place_name(geopos.coords.latitude, geopos.coords.longitude);
 }
 
 function errGeoPos(error) {
-	alert('Geolocation error ' + error.code + ': ' + error.message);
+	alert("Não foi possível obter sua localização (" + error.message + "). Use a busca ou o mapa.");
 }
 
 function getGeoPos() {
 	if (navigator.geolocation) {
 		navigator.geolocation.getCurrentPosition(setGeoPos, errGeoPos);
 	} else {
-		alert('Geolocation is not supported by this browser.');
+		alert("Este navegador não informa a localização. Use a busca ou o mapa.");
 	}
 }
 

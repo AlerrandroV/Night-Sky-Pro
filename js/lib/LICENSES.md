@@ -4,6 +4,7 @@ Cópias sem modificação dos arquivos de distribuição publicados no npm.
 
 - `opentype.min.js`: opentype.js 1.3.4, licença MIT (abaixo).
 - `jszip.min.js`: JSZip 3.10.1, licença dupla MIT ou GPLv3; usada aqui sob a MIT (abaixo).
+- `leaflet/`: Leaflet 1.9.4 (`leaflet.js` e `leaflet.css`), licença BSD-2-Clause, em `leaflet/LICENSE`.
 
 ## opentype.js
 

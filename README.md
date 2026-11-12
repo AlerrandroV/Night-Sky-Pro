@@ -12,7 +12,8 @@ O Night Sky Pro faz isso de graça. Ele é e sempre será **100% gratuito**, sem
 
 ## Funcionalidades
 
-- **Momento e local:** escolha data, hora, latitude e longitude, ou use os botões "Agora" e "Minha localização" (geolocalização do navegador).
+- **Momento:** escolha data e hora, ou use o botão "Agora".
+- **Local:** busque por cidade, rua ou endereço com sugestões enquanto digita, escolha o ponto num mapa ("Selecionar no mapa"), use "Minha localização" ou digite latitude e longitude. O nome do lugar pode aparecer no pôster.
 - **Elementos do céu:** estrelas e seus nomes, planetas, a Lua desenhada na fase exata do momento, linhas e nomes de constelações, objetos de céu profundo e uma grade de coordenadas equatoriais com rótulos de horas e declinações.
 - **Personalização completa:** cada elemento pode ser ligado ou desligado e tem a própria cor e escala (tamanho ou espessura). O painel é organizado em seções expansíveis e esconde as opções que não fazem efeito, como a cor das linhas de constelação quando as linhas estão desligadas.
 - **Moldura:** um retângulo perto das bordas do quadro e o contorno do céu, com cor e espessura ajustáveis.
@@ -49,8 +50,9 @@ js/skypos.js     Posições de Sol, Lua e planetas (Ernie Wright)
 js/skydb.js      Catálogo de estrelas, constelações e DSOs (Ernie Wright)
 js/plani.js      Desenho do céu, pôster, controles e exportação
 js/fonts.js      Fontes: pré-programadas, importadas e do dafont
+js/location.js   Busca de endereços e escolha do local no mapa
 js/jscolor.js    Seletor de cores (jscolor)
-js/lib/          opentype.js (texto em contornos) e JSZip (abrir .zip)
+js/lib/          opentype.js (texto em contornos), JSZip (abrir .zip) e Leaflet (mapa)
 fonts/           Fontes pré-programadas (WOFF) e suas licenças
 ```
 
@@ -61,6 +63,9 @@ fonts/           Fontes pré-programadas (WOFF) e suas licenças
 - **Jan Odvarko (East Desire)**: autor do [jscolor](https://jscolor.com), biblioteca usada no seletor de cores.
 - **[opentype.js](https://opentype.js.org)** (MIT): converte os textos do pôster em contornos.
 - **[JSZip](https://stuk.github.io/jszip/)** (MIT): abre os arquivos .zip de fontes.
+- **[Leaflet](https://leafletjs.com)** (BSD-2): mapa para escolher o local.
+- **[OpenStreetMap](https://www.openstreetmap.org/copyright)**: dados e imagens do mapa, © colaboradores do OpenStreetMap.
+- **[Photon](https://photon.komoot.io)** (komoot): busca de endereços com sugestões.
 - **Fontes** Inter, Montserrat, Josefin Sans, Playfair Display, Cormorant Garamond, Cinzel, Great Vibes, Dancing Script, Pacifico e Caveat, todas sob a [SIL Open Font License](https://openfontlicense.org), obtidas pelo [Fontsource](https://fontsource.org). As licenças estão em `fonts/licenses/`.
 
 Muito obrigado a eles pelo trabalho aberto.
