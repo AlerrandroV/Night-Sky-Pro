@@ -34,7 +34,7 @@
 		<div id="controls">
 
 			<details class="group" open>
-				<summary>Momento</summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>Momento</span></summary>
 				<div id="datetime">
 					<input type="text" id="user_date" value="2023-12-21" placeholder="Data"
 					onfocus="(this.type='date')" onblur="(this.type='text')">
@@ -45,7 +45,7 @@
 			</details>
 
 			<details class="group" open>
-				<summary>Local</summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>Local</span></summary>
 				<div id="location-inputs">
 					<input type="number" id="user_lat" value="-1.3529019" placeholder="Latitude"
 					onfocus="(this.placeholder='Ex.: -23.5505')" onblur="(this.placeholder='Latitude')">
@@ -56,7 +56,7 @@
 			</details>
 
 			<details class="group">
-				<summary>Quadro</summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="2.5" width="16" height="19" rx="1.5"/><path d="M7 17.5l3.5-4 2.5 2.5 2-2 2 3.5"/><circle cx="9.5" cy="8.5" r="1.5"/></svg>Quadro</span></summary>
 				<div class="set-item">
 					<label for="frame_format">Formato</label>
 					<select id="frame_format">
@@ -86,7 +86,7 @@
 			</details>
 
 			<details class="group">
-				<summary>Moldura e contorno do céu</summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="1.5"/><circle cx="12" cy="12" r="5.5"/></svg>Moldura e contorno do céu</span></summary>
 				<div class="set-item">
 					Mostrar
 					<label class="switch"><input id="show_border" type="checkbox"><span class="slider"></span></label>
@@ -106,7 +106,7 @@
 			</details>
 
 			<details class="group">
-				<summary>Céu e estrelas</summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg>Céu e estrelas</span></summary>
 				<div class="set-item">
 					Cor do céu
 					<input id="sky_color" data-jscolor="{}">
@@ -135,7 +135,7 @@
 			</details>
 
 			<details class="group">
-				<summary>Planetas</summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><path d="M7.4 14.6C4.3 16.6 2.6 18.5 3.2 19.4c.9 1.4 6.4-.6 11.6-4.3s8.6-8.2 7.7-9.6c-.5-.9-2.6-.6-5.5.8"/></svg>Planetas</span></summary>
 				<div class="set-item">
 					Mostrar
 					<label class="switch"><input id="show_planets" type="checkbox"><span class="slider"></span></label>
@@ -159,7 +159,7 @@
 			</details>
 
 			<details class="group">
-				<summary>Lua</summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg>Lua</span></summary>
 				<div class="set-item">
 					Mostrar (na fase do momento)
 					<label class="switch"><input id="show_moon" type="checkbox"><span class="slider"></span></label>
@@ -187,7 +187,7 @@
 			</details>
 
 			<details class="group">
-				<summary>Constelações</summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18l4.5-6 5 3L20 6"/><circle cx="4" cy="18" r="1.7" fill="currentColor"/><circle cx="8.5" cy="12" r="1.7" fill="currentColor"/><circle cx="13.5" cy="15" r="1.7" fill="currentColor"/><circle cx="20" cy="6" r="1.7" fill="currentColor"/></svg>Constelações</span></summary>
 				<div class="set-item">
 					Linhas
 					<label class="switch"><input id="user_conline" type="checkbox"><span class="slider"></span></label>
@@ -216,7 +216,7 @@
 			</details>
 
 			<details class="group">
-				<summary>Objetos de céu profundo</summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="12" rx="10" ry="4.3" transform="rotate(-28 12 12)"/><ellipse cx="12" cy="12" rx="4.6" ry="2.3" transform="rotate(-28 12 12)"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg>Objetos de céu profundo</span></summary>
 				<div class="set-item">
 					Mostrar (galáxias, nebulosas, aglomerados)
 					<label class="switch"><input id="user_dsos" type="checkbox"><span class="slider"></span></label>
@@ -232,7 +232,7 @@
 			</details>
 
 			<details class="group">
-				<summary>Grade de coordenadas</summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18M4.6 7.5h14.8M4.6 16.5h14.8"/></svg>Grade de coordenadas</span></summary>
 				<div class="set-item">
 					Mostrar
 					<label class="switch"><input id="show_grid" type="checkbox"><span class="slider"></span></label>
@@ -268,7 +268,7 @@
 			</details>
 
 			<details class="group">
-				<summary>Textos</summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7V4.5h14V7M12 4.5v15M9 19.5h6"/></svg>Textos</span></summary>
 				<div class="set-item">
 					Mensagem
 					<input id="user_message" type="text" placeholder="Deixe vazio para não mostrar">
@@ -296,7 +296,7 @@
 			</details>
 
 			<details class="group">
-				<summary>Fontes</summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 19L7.5 5l5 14M4.3 14h6.4"/><circle cx="17.5" cy="15.5" r="3.5"/><path d="M21 12v7"/></svg>Fontes</span></summary>
 				<div class="set-item">
 					Mensagem
 					<select id="msg_font"></select>
@@ -326,7 +326,7 @@
 			</details>
 
 			<details class="group">
-				<summary>Código do Spotify</summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5v3M7.5 7v10M11 9v6M14.5 5v14M18 8.5v7M21 11v2"/></svg>Código do Spotify</span></summary>
 				<div class="set-item">
 					Mostrar
 					<label class="switch"><input id="show_spotify" type="checkbox"><span class="slider"></span></label>

@@ -494,3 +494,22 @@ details.group hr {
 #font_status:empty {
 	display: none;
 }
+
+/* Ícones das seções */
+.sum-title {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.sum-title .icon {
+	width: 20px;
+	height: 20px;
+	flex-shrink: 0;
+	color: #6200ee;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 1.7;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
