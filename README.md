@@ -17,6 +17,7 @@ O Night Sky Pro faz isso de graça. Ele é e sempre será **100% gratuito**, sem
 - **Personalização completa:** cada elemento pode ser ligado ou desligado e tem a própria cor e escala (tamanho ou espessura). O painel é organizado em seções expansíveis e esconde as opções que não fazem efeito, como a cor das linhas de constelação quando as linhas estão desligadas.
 - **Moldura:** um retângulo perto das bordas do quadro e o contorno do céu, com cor e espessura ajustáveis.
 - **Textos no pôster:** mensagem, data, hora e coordenadas, com cor e tamanho ajustáveis.
+- **Código do Spotify:** cole o link de uma música, álbum, playlist ou podcast e o quadro ganha o código escaneável pelo app do Spotify, com cor e tamanho ajustáveis. O código é baixado do serviço do próprio Spotify (`scannables.scdn.co`), então precisa de internet.
 - **Formatos de quadro:** A4, A3, A2, 15×15, 30×40, 40×50, 50×70, 60×90 cm ou tamanho personalizado, com cor de fundo própria.
 - **Exportação:** PNG em resolução configurável ou SVG vetorial, já com o tamanho físico do quadro em cm.
 

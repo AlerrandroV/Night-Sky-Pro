@@ -290,9 +290,28 @@
 					Tamanho dos textos
 					<input id="text_scale" type="number" min="0.1" step="0.1">
 				</div>
+			</details>
+
+			<details class="group">
+				<summary>Código do Spotify</summary>
 				<div class="set-item">
-					Música (ainda não aparece no quadro)
-					<input id="user_music" type="text" placeholder="Link da música">
+					Mostrar
+					<label class="switch"><input id="show_spotify" type="checkbox"><span class="slider"></span></label>
+				</div>
+				<div class="set-item" data-show-if="show_spotify">
+					Link
+					<input id="user_music" type="text" placeholder="https://open.spotify.com/track/...">
+				</div>
+				<div class="set-item" data-show-if="show_spotify">
+					<p id="spotify_status" class="status"></p>
+				</div>
+				<div class="set-item" data-show-if="show_spotify">
+					Cor
+					<input id="spotify_color" data-jscolor="{}">
+				</div>
+				<div class="set-item" data-show-if="show_spotify">
+					Tamanho
+					<input id="spotify_scale" type="number" min="0.1" step="0.1">
 				</div>
 			</details>
 
