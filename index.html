@@ -24,7 +24,7 @@
 
 	<div id="main">
 		<!-- Canvas -->
-		<div id="planicanvas" width="30" height="30"></div>
+		<div id="planicanvas" onclick="openPosterZoom()" title="Toque para ampliar"></div>
 
 		<!-- Controls Panel -->
 		<div id="controls">
@@ -238,5 +238,9 @@
 
 	</div>
 
+	<!-- Visualização do quadro em tela cheia -->
+	<div id="poster-zoom" onclick="closePosterZoom(event)">
+		<button id="poster-zoom-close" type="button" aria-label="Fechar">✕</button>
+	</div>
 </body>
 </html>

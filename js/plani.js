@@ -305,6 +305,7 @@ var POSTER_FONT = "'Helvetica Neue', Helvetica, Arial, sans-serif";
 var MAX_CANVAS_AREA = 16777216; // limite de pixels do canvas no Safari/iOS
 
 var resolution = 3000; // lado maior do PNG, em pixels
+var poster_count = 0;  // ids únicos de clipPath (prévia e tela cheia coexistem)
 
 var FRAME_SIZES = {
 	"A4": { w: 21, h: 29.7 },
@@ -431,12 +432,13 @@ function build_poster() {
 		x: skyX, y: skyY, width: diameter, height: diameter,
 		viewBox: "0 0 " + SKY_SIZE + " " + SKY_SIZE
 	});
-	var clip = svg_el("clipPath", { id: "sky-clip" });
+	var clipId = "sky-clip-" + (++poster_count);
+	var clip = svg_el("clipPath", { id: clipId });
 	clip.appendChild(svg_el("circle", { cx: SKY_SIZE / 2, cy: SKY_SIZE / 2, r: SKY_SIZE / 2 }));
 	var defs = svg_el("defs", {});
 	defs.appendChild(clip);
 	sky.appendChild(defs);
-	var skyGroup = svg_el("g", { "clip-path": "url(#sky-clip)" });
+	var skyGroup = svg_el("g", { "clip-path": "url(#" + clipId + ")" });
 	draw_sky_into(sky, skyGroup);
 	sky.appendChild(skyGroup);
 	sky.appendChild(svg_el("circle", {
@@ -486,6 +488,25 @@ function refresh() {
 		container.appendChild(build_poster());
 	}
 }
+
+// Mostra o quadro inteiro em tela cheia, para conferir textos e detalhes
+function openPosterZoom() {
+	if (!validateFields()) return;
+	var zoom = document.getElementById("poster-zoom");
+	var old = zoom.querySelector("svg");
+	if (old) zoom.removeChild(old);
+	zoom.appendChild(build_poster());
+	zoom.classList.add("open");
+}
+
+function closePosterZoom(event) {
+	event.stopPropagation();
+	document.getElementById("poster-zoom").classList.remove("open");
+}
+
+document.addEventListener("keydown", function (e) {
+	if (e.key === "Escape") document.getElementById("poster-zoom").classList.remove("open");
+});
 
 function poster_filename(ext) {
 	var dt = document.getElementById("user_date").value;
