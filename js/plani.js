@@ -6,6 +6,7 @@ var ck_conlines = false;
 var ck_coordinates = true;
 var ck_date = true;
 var ck_time = true;
+var ck_border = true;
 
 var sky_color = "#102";
 var star_color = "#fff";
@@ -393,6 +394,17 @@ function build_poster() {
 
 	// Tamanhos proporcionais ao lado menor, para valer em qualquer formato
 	var unit = Math.min(W, H);
+
+	// Moldura: retângulo branco a uma pequena distância das bordas do quadro.
+	// Fica dentro da margem do conteúdo, então não encosta no céu nem no texto.
+	if (ck_border) {
+		var inset = 0.035 * unit;
+		var stroke = 0.0025 * unit;
+		svg.appendChild(svg_el("rect", {
+			x: inset, y: inset, width: W - 2 * inset, height: H - 2 * inset,
+			fill: "none", stroke: "#ffffff", "stroke-width": stroke
+		}));
+	}
 	var texts = poster_texts();
 	var msgSize = 0.045 * unit;
 	var detSize = 0.024 * unit;
@@ -605,6 +617,7 @@ function set_user_obs() {
 	document.getElementById("show_coordinates").checked = ck_coordinates;
 	document.getElementById("show_date").checked = ck_date;
 	document.getElementById("show_time").checked = ck_time;
+	document.getElementById("show_border").checked = ck_border;
 
 	document.getElementById("user_message").value = message;
 	document.getElementById("user_music").value = song_link;
@@ -663,6 +676,7 @@ function get_user_obs() {
 	ck_coordinates = document.getElementById("show_coordinates").checked;
 	ck_date = document.getElementById("show_date").checked;
 	ck_time = document.getElementById("show_time").checked;
+	ck_border = document.getElementById("show_border").checked;
 
 	// cores, escalas e tamanhos
 	sky_color = document.getElementById("sky_color").value;
