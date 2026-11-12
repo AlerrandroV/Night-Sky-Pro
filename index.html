@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1">
@@ -20,233 +20,251 @@
 		};
 	</script>
 </head>
-<body onclick="get_user_obs()">
+<body>
 
 	<div id="main">
 		<!-- Canvas -->
 		<div id="planicanvas" onclick="openPosterZoom()" title="Toque para ampliar"></div>
 
-		<!-- Controls Panel -->
+		<!-- Painel de configurações: seções expansíveis. Itens com data-show-if
+		     só aparecem quando os interruptores indicados estão ligados. -->
 		<div id="controls">
 
-			<!-- Moment -->
-			<section id="moment">
-				<h4>Moment</h4>
+			<details class="group" open>
+				<summary>Momento</summary>
 				<div id="datetime">
-					<input type="text" id="user_date" value="2023-12-21" placeholder="Date"
-					onfocus="(this.type='date')" onblur="(this.type='text')" onchange="get_user_obs()">
-					<input type="text" id="user_time" value="22:31" placeholder="Hour"
-					onfocus="(this.type='time')" onblur="(this.type='text')" onchange="get_user_obs()">
-					<input id="time" type="button" value="Current time" onclick="currentTime()">
+					<input type="text" id="user_date" value="2023-12-21" placeholder="Data"
+					onfocus="(this.type='date')" onblur="(this.type='text')">
+					<input type="text" id="user_time" value="22:31" placeholder="Hora"
+					onfocus="(this.type='time')" onblur="(this.type='text')">
+					<input id="time" type="button" value="Agora" onclick="currentTime()">
 				</div>
-			</section>
+			</details>
 
-			<!-- Location -->
-			<section id="location">
-				<h4>Location</h4>
+			<details class="group" open>
+				<summary>Local</summary>
 				<div id="location-inputs">
-					<input type="number" id="user_lat" value="-1.3529019" placeholder="Latitude (°S)"
-					onfocus="(this.placeholder='Ex.: 90.0000')" onblur="(this.placeholder='Latitude (°S)')"
-					onchange="get_user_obs()">
-					<input type="number" id="user_lon" value="-48.3882851" placeholder="Longitude (°W)"
-					onfocus="(this.placeholder='Ex.: 180.0000')" onblur="(this.placeholder='Longitude (°W)')"
-					onchange="get_user_obs()">
-					<input id="geoloc" type="button" value="Current location" onclick="getGeoPos()">
+					<input type="number" id="user_lat" value="-1.3529019" placeholder="Latitude"
+					onfocus="(this.placeholder='Ex.: -23.5505')" onblur="(this.placeholder='Latitude')">
+					<input type="number" id="user_lon" value="-48.3882851" placeholder="Longitude"
+					onfocus="(this.placeholder='Ex.: -46.6333')" onblur="(this.placeholder='Longitude')">
+					<input id="geoloc" type="button" value="Minha localização" onclick="getGeoPos()">
 				</div>
-			</section>
+			</details>
 
-			<!-- Basic Settings -->
-			<section id="settings">
-				<h4>Settings</h4>
-
+			<details class="group">
+				<summary>Quadro</summary>
 				<div class="set-item">
-					Deep Space Objects (DSOs)
-					<label class="switch">
-						<input id="user_dsos" type="checkbox" onchange="get_user_obs()">
-						<span class="slider"></span>
-					</label>
-				</div>
-
-				<div class="set-item">
-					Star Names
-					<label class="switch">
-						<input id="user_starlab" type="checkbox" onchange="get_user_obs()">
-						<span class="slider"></span>
-					</label>
-				</div>
-
-				<div class="set-item">
-					Constellation Lines
-					<label class="switch">
-						<input id="user_conline" type="checkbox" onchange="get_user_obs()">
-						<span class="slider"></span>
-					</label>
-				</div>
-
-				<div class="set-item">
-					Constellation Names
-					<label class="switch">
-						<input id="user_conlab" type="checkbox" onchange="get_user_obs()">
-						<span class="slider"></span>
-					</label>
-				</div>
-
-				<div class="set-item">
-					Show Coordinates
-					<label class="switch">
-						<input id="show_coordinates" type="checkbox" onchange="get_user_obs()">
-						<span class="slider"></span>
-					</label>
-				</div>
-
-				<div class="set-item">
-					Show Date
-					<label class="switch">
-						<input id="show_date" type="checkbox" onchange="get_user_obs()">
-						<span class="slider"></span>
-					</label>
-				</div>
-
-				<div class="set-item">
-					Show Time
-					<label class="switch">
-						<input id="show_time" type="checkbox" onchange="get_user_obs()">
-						<span class="slider"></span>
-					</label>
-				</div>
-				<div class="set-item">
-					Coordinate Grid
-					<label class="switch">
-						<input id="show_grid" type="checkbox" onchange="get_user_obs()">
-						<span class="slider"></span>
-					</label>
-				</div>
-				<div class="set-item">
-					Show Borders (frame and sky)
-					<label class="switch">
-						<input id="show_border" type="checkbox" onchange="get_user_obs()">
-						<span class="slider"></span>
-					</label>
-				</div>
-
-				<div class="set-item">
-					Message (optional)
-					<input id="user_message" type="text" placeholder="Enter message..." onchange="get_user_obs()">
-				</div>
-
-				<div class="set-item">
-					Music (opcional)
-					<input id="user_music" type="text" placeholder="Music URL" onchange="get_user_obs()">
-				</div>
-
-				<div class="set-item">
-					<label for="frame_format">Formato do quadro:</label>
-					<select id="frame_format" onchange="onFrameFormatChange()">
-						<option value="A4">A4 (21 x 29,7 cm)</option>
-						<option value="A3">A3 (29,7 x 42 cm)</option>
-						<option value="A2">A2 (42 x 59,4 cm)</option>
-						<option value="15x15">15 x 15 cm</option>
-						<option value="30x40">30 x 40 cm</option>
-						<option value="40x50">40 x 50 cm</option>
-						<option value="50x70">50 x 70 cm</option>
-						<option value="60x90">60 x 90 cm</option>
+					<label for="frame_format">Formato</label>
+					<select id="frame_format">
+						<option value="A4">A4 (21 × 29,7 cm)</option>
+						<option value="A3">A3 (29,7 × 42 cm)</option>
+						<option value="A2">A2 (42 × 59,4 cm)</option>
+						<option value="15x15">15 × 15 cm</option>
+						<option value="30x40">30 × 40 cm</option>
+						<option value="40x50">40 × 50 cm</option>
+						<option value="50x70">50 × 70 cm</option>
+						<option value="60x90">60 × 90 cm</option>
 						<option value="custom">Personalizado</option>
 					</select>
-					<div id="custom_size" style="display:none;">
-						<input type="number" id="custom_width" placeholder="Largura (cm)" min="5" step="0.1" onchange="get_user_obs()">
-						<input type="number" id="custom_height" placeholder="Altura (cm)" min="5" step="0.1" onchange="get_user_obs()">
-					</div>
 				</div>
+				<div id="custom_size" class="set-item" style="display:none;">
+					<input type="number" id="custom_width" placeholder="Largura (cm)" min="5" step="0.1">
+					<input type="number" id="custom_height" placeholder="Altura (cm)" min="5" step="0.1">
+				</div>
+				<div class="set-item">
+					Cor do fundo
+					<input id="bg_color" data-jscolor="{}">
+				</div>
+				<div class="set-item">
+					Resolução do PNG (px, lado maior)
+					<input id="resolution" type="number" min="256" step="100">
+				</div>
+			</details>
 
-			</section>
+			<details class="group">
+				<summary>Moldura e contorno do céu</summary>
+				<div class="set-item">
+					Mostrar
+					<label class="switch"><input id="show_border" type="checkbox"><span class="slider"></span></label>
+				</div>
+				<div class="set-item" data-show-if="show_border">
+					Cor
+					<input id="border_color" data-jscolor="{}">
+				</div>
+				<div class="set-item" data-show-if="show_border">
+					Espessura
+					<input id="border_scale" type="number" min="0.1" step="0.1">
+				</div>
+			</details>
 
-			<!-- Advanced Settings -->
-			<section id="advanced-settings">
-				<h4>Other Settings</h4>
-
-				<!-- Resolution -->
+			<details class="group">
+				<summary>Céu e estrelas</summary>
 				<div class="set-item">
-					Resolution (px, lado maior)
-					<input id="resolution" type="number" value="3000" min="256" step="100" onchange="get_user_obs()">
-				</div>
-
-				<!-- Sky Color -->
-				<div class="set-item">
-					Sky Color
-					<input id="sky_color" data-jscolor="{}" value="#102" onchange="get_user_obs()">
-				</div>
-
-				<!-- Star Settings -->
-				<div class="set-item">
-					Star Scale
-					<input id="star_scale" type="number" value="1.5" step="0.1" onchange="get_user_obs()">
+					Cor do céu
+					<input id="sky_color" data-jscolor="{}">
 				</div>
 				<div class="set-item">
-					Star Color
-					<input id="star_color" data-jscolor="{}" value="#ffffff" onchange="get_user_obs()">
+					Cor das estrelas
+					<input id="star_color" data-jscolor="{}">
 				</div>
 				<div class="set-item">
-					Star Label Size
-					<input id="starLabel_size" type="number" value="10" onchange="get_user_obs()">
+					Tamanho das estrelas
+					<input id="star_scale" type="number" min="0.1" step="0.1">
 				</div>
-				<div class="set-item">
-					Star Label Color
-					<input id="starLabel_color" data-jscolor="{}" value="#cccccc" onchange="get_user_obs()">
-				</div>
-
-				<!-- Planet Settings -->
-				<div class="set-item">
-					Planet Label Size
-					<input id="planetLabel_size" type="number" value="10" onchange="get_user_obs()">
-				</div>
-				<div class="set-item">
-					Star Label Color
-					<input id="Label_color" data-jscolor="{}" value="#cccccc" onchange="get_user_obs()">
-				</div>
-
 				<hr>
+				<div class="set-item">
+					Nomes das estrelas
+					<label class="switch"><input id="user_starlab" type="checkbox"><span class="slider"></span></label>
+				</div>
+				<div class="set-item" data-show-if="user_starlab">
+					Cor dos nomes
+					<input id="starLabel_color" data-jscolor="{}">
+				</div>
+				<div class="set-item" data-show-if="user_starlab">
+					Tamanho dos nomes
+					<input id="starLabel_size" type="number" min="1" step="1">
+				</div>
+			</details>
 
-				<!-- Constellation Settings -->
+			<details class="group">
+				<summary>Planetas</summary>
 				<div class="set-item">
-					Constellation Line Scale
-					<input id="conLine_scale" type="number" value="1" step="0.1" onchange="get_user_obs()">
+					Mostrar
+					<label class="switch"><input id="show_planets" type="checkbox"><span class="slider"></span></label>
 				</div>
-				<div class="set-item">
-					Constellation Line Color
-					<input id="conLine_color" data-jscolor="{}" value="#888888" onchange="get_user_obs()">
+				<div class="set-item" data-show-if="show_planets">
+					Tamanho dos planetas
+					<input id="planet_scale" type="number" min="0.1" step="0.1">
 				</div>
-				<div class="set-item">
-					Constellation Label Size
-					<input id="conLabel_size" type="number" value="10" onchange="get_user_obs()">
+				<div class="set-item" data-show-if="show_planets">
+					Nomes dos planetas
+					<label class="switch"><input id="show_planetlab" type="checkbox"><span class="slider"></span></label>
 				</div>
-				<div class="set-item">
-					Constellation Label Color
-					<input id="conLabel_color" data-jscolor="{}" value="#cccccc" onchange="get_user_obs()">
+				<div class="set-item" data-show-if="show_planets show_planetlab">
+					Cor dos nomes
+					<input id="planetLabel_color" data-jscolor="{}">
 				</div>
+				<div class="set-item" data-show-if="show_planets show_planetlab">
+					Tamanho dos nomes
+					<input id="planetLabel_size" type="number" min="1" step="1">
+				</div>
+			</details>
 
+			<details class="group">
+				<summary>Constelações</summary>
+				<div class="set-item">
+					Linhas
+					<label class="switch"><input id="user_conline" type="checkbox"><span class="slider"></span></label>
+				</div>
+				<div class="set-item" data-show-if="user_conline">
+					Cor das linhas
+					<input id="conLine_color" data-jscolor="{}">
+				</div>
+				<div class="set-item" data-show-if="user_conline">
+					Espessura das linhas
+					<input id="conLine_scale" type="number" min="0.1" step="0.1">
+				</div>
 				<hr>
-
-				<!-- DSOs Labels -->
 				<div class="set-item">
-					DSOs Label Size
-					<input id="dsoLabel_size" type="number" value="10" onchange="get_user_obs()">
+					Nomes
+					<label class="switch"><input id="user_conlab" type="checkbox"><span class="slider"></span></label>
+				</div>
+				<div class="set-item" data-show-if="user_conlab">
+					Cor dos nomes
+					<input id="conLabel_color" data-jscolor="{}">
+				</div>
+				<div class="set-item" data-show-if="user_conlab">
+					Tamanho dos nomes
+					<input id="conLabel_size" type="number" min="1" step="1">
+				</div>
+			</details>
+
+			<details class="group">
+				<summary>Objetos de céu profundo</summary>
+				<div class="set-item">
+					Mostrar (galáxias, nebulosas, aglomerados)
+					<label class="switch"><input id="user_dsos" type="checkbox"><span class="slider"></span></label>
+				</div>
+				<div class="set-item" data-show-if="user_dsos">
+					Cor
+					<input id="dsoLabel_color" data-jscolor="{}">
+				</div>
+				<div class="set-item" data-show-if="user_dsos">
+					Tamanho dos nomes
+					<input id="dsoLabel_size" type="number" min="1" step="1">
+				</div>
+			</details>
+
+			<details class="group">
+				<summary>Grade de coordenadas</summary>
+				<div class="set-item">
+					Mostrar
+					<label class="switch"><input id="show_grid" type="checkbox"><span class="slider"></span></label>
+				</div>
+				<div class="set-item" data-show-if="show_grid">
+					Cor das linhas
+					<input id="grid_color" data-jscolor="{}">
+				</div>
+				<div class="set-item" data-show-if="show_grid">
+					Espessura das linhas
+					<input id="grid_scale" type="number" min="0.1" step="0.1">
+				</div>
+				<div class="set-item" data-show-if="show_grid">
+					Rótulos (horas e declinações)
+					<label class="switch"><input id="show_gridlab" type="checkbox"><span class="slider"></span></label>
+				</div>
+				<div class="set-item" data-show-if="show_grid show_gridlab">
+					Cor dos rótulos
+					<input id="gridLabel_color" data-jscolor="{}">
+				</div>
+				<div class="set-item" data-show-if="show_grid show_gridlab">
+					Tamanho dos rótulos
+					<input id="gridLabel_size" type="number" min="1" step="1">
+				</div>
+			</details>
+
+			<details class="group">
+				<summary>Textos</summary>
+				<div class="set-item">
+					Mensagem
+					<input id="user_message" type="text" placeholder="Deixe vazio para não mostrar">
 				</div>
 				<div class="set-item">
-					DSOs Label Color
-					<input id="dsoLabel_color" data-jscolor="{}" value="#cccccc" onchange="get_user_obs()">
+					Data
+					<label class="switch"><input id="show_date" type="checkbox"><span class="slider"></span></label>
 				</div>
-
-			</section>
+				<div class="set-item">
+					Hora
+					<label class="switch"><input id="show_time" type="checkbox"><span class="slider"></span></label>
+				</div>
+				<div class="set-item">
+					Coordenadas
+					<label class="switch"><input id="show_coordinates" type="checkbox"><span class="slider"></span></label>
+				</div>
+				<div class="set-item">
+					Cor dos textos
+					<input id="text_color" data-jscolor="{}">
+				</div>
+				<div class="set-item">
+					Tamanho dos textos
+					<input id="text_scale" type="number" min="0.1" step="0.1">
+				</div>
+				<div class="set-item">
+					Música (ainda não aparece no quadro)
+					<input id="user_music" type="text" placeholder="Link da música">
+				</div>
+			</details>
 
 		</div>
 
 		<!-- Action Buttons fixos -->
 		<section id="actions">
 			<div id="btn-save-image" onclick="saveImage()">
-				SAVE IMAGE
+				SALVAR IMAGEM
 			</div>
 			<div id="btn-save-vector" onclick="saveAsVector()">
-				SAVE VECTOR
+				SALVAR VETOR
 			</div>
 		</section>
 

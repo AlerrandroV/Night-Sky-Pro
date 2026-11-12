@@ -12,12 +12,13 @@ O Night Sky Pro faz isso de graça. Ele é e sempre será **100% gratuito**, sem
 
 ## Funcionalidades
 
-- **Momento e local:** escolha data, hora, latitude e longitude, ou use os botões de hora atual e localização atual (geolocalização do navegador).
-- **Objetos do céu:** estrelas, planetas, Lua, linhas e nomes de constelações, nomes de estrelas e objetos de céu profundo (DSOs), cada um podendo ser ligado ou desligado.
-- **Personalização visual:** cor do céu, cor e escala das estrelas, cor e tamanho de cada tipo de rótulo, cor e espessura das linhas de constelação.
-- **Informações no pôster:** coordenadas, data, hora e uma mensagem personalizada, todas opcionais.
-- **Formatos de quadro:** A4, A3, A2, 15×15, 30×40, 40×50, 50×70, 60×90 cm ou tamanho personalizado.
-- **Exportação:** salve como imagem (PNG) em resolução configurável ou como vetor (SVG).
+- **Momento e local:** escolha data, hora, latitude e longitude, ou use os botões "Agora" e "Minha localização" (geolocalização do navegador).
+- **Elementos do céu:** estrelas e seus nomes, planetas, linhas e nomes de constelações, objetos de céu profundo e uma grade de coordenadas equatoriais com rótulos de horas e declinações.
+- **Personalização completa:** cada elemento pode ser ligado ou desligado e tem a própria cor e escala (tamanho ou espessura). O painel é organizado em seções expansíveis e esconde as opções que não fazem efeito, como a cor das linhas de constelação quando as linhas estão desligadas.
+- **Moldura:** um retângulo perto das bordas do quadro e o contorno do céu, com cor e espessura ajustáveis.
+- **Textos no pôster:** mensagem, data, hora e coordenadas, com cor e tamanho ajustáveis.
+- **Formatos de quadro:** A4, A3, A2, 15×15, 30×40, 40×50, 50×70, 60×90 cm ou tamanho personalizado, com cor de fundo própria.
+- **Exportação:** PNG em resolução configurável ou SVG vetorial, já com o tamanho físico do quadro em cm.
 
 ## Como usar
 
