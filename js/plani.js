@@ -243,6 +243,46 @@ function draw_grid(svg, w, h) {
 	path.setAttribute("stroke-opacity", 0.3);
 	path.setAttribute("stroke-width", w / 1000);
 	svg.appendChild(path);
+
+	draw_grid_labels(svg, w, h);
+}
+
+// Rótulos da grade: as horas de ascensão reta ao longo do equador celeste e as
+// declinações ao longo do meridiano mais próximo do zênite (o mais visível).
+// Só entram os rótulos que caem dentro do círculo do céu.
+function draw_grid_labels(svg, w, h) {
+	var DEG = Math.PI / 180;
+	var radius = Math.min(w, h) / 2;
+	var size = w / 75;
+
+	function inside(p) {
+		return Math.hypot(p[0] - w / 2, p[1] - h / 2) < radius - size * 1.5;
+	}
+
+	function label(p, text, anchor, dx, dy) {
+		var t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+		t.setAttribute("x", p[0] + dx);
+		t.setAttribute("y", p[1] + dy);
+		t.setAttribute("fill", border_color);
+		t.setAttribute("fill-opacity", 0.6);
+		t.setAttribute("font-size", size);
+		t.setAttribute("text-anchor", anchor);
+		t.textContent = text;
+		svg.appendChild(t);
+	}
+
+	for (var hr = 0; hr < 24; hr++) {
+		var p = project_radec(hr * 15 * DEG, 0, w, h);
+		if (inside(p)) label(p, hr + "h", "middle", 0, -size * 0.4);
+	}
+
+	var hrZenith = Math.round(now.lst / (15 * DEG)) % 24;
+	for (var dec = -75; dec <= 75; dec += 15) {
+		if (dec === 0) continue; // o cruzamento com o equador já tem o rótulo da hora
+		var q = project_radec(hrZenith * 15 * DEG, dec * DEG, w, h);
+		var text = (dec > 0 ? "+" : "\u2212") + Math.abs(dec) + "\u00b0";
+		if (inside(q)) label(q, text, "start", size * 0.35, -size * 0.35);
+	}
 }
 
 function draw_sky(svg, w, h) {
