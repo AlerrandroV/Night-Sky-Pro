@@ -152,6 +152,34 @@
 			</details>
 
 			<details class="group">
+				<summary>Lua</summary>
+				<div class="set-item">
+					Mostrar (na fase do momento)
+					<label class="switch"><input id="show_moon" type="checkbox"><span class="slider"></span></label>
+				</div>
+				<div class="set-item" data-show-if="show_moon">
+					Cor
+					<input id="moon_color" data-jscolor="{}">
+				</div>
+				<div class="set-item" data-show-if="show_moon">
+					Tamanho
+					<input id="moon_scale" type="number" min="0.1" step="0.1">
+				</div>
+				<div class="set-item" data-show-if="show_moon">
+					Nome
+					<label class="switch"><input id="show_moonlab" type="checkbox"><span class="slider"></span></label>
+				</div>
+				<div class="set-item" data-show-if="show_moon show_moonlab">
+					Cor do nome
+					<input id="moonLabel_color" data-jscolor="{}">
+				</div>
+				<div class="set-item" data-show-if="show_moon show_moonlab">
+					Tamanho do nome
+					<input id="moonLabel_size" type="number" min="1" step="1">
+				</div>
+			</details>
+
+			<details class="group">
 				<summary>Constelações</summary>
 				<div class="set-item">
 					Linhas

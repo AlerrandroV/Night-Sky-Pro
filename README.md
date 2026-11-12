@@ -13,7 +13,7 @@ O Night Sky Pro faz isso de graça. Ele é e sempre será **100% gratuito**, sem
 ## Funcionalidades
 
 - **Momento e local:** escolha data, hora, latitude e longitude, ou use os botões "Agora" e "Minha localização" (geolocalização do navegador).
-- **Elementos do céu:** estrelas e seus nomes, planetas, linhas e nomes de constelações, objetos de céu profundo e uma grade de coordenadas equatoriais com rótulos de horas e declinações.
+- **Elementos do céu:** estrelas e seus nomes, planetas, a Lua desenhada na fase exata do momento, linhas e nomes de constelações, objetos de céu profundo e uma grade de coordenadas equatoriais com rótulos de horas e declinações.
 - **Personalização completa:** cada elemento pode ser ligado ou desligado e tem a própria cor e escala (tamanho ou espessura). O painel é organizado em seções expansíveis e esconde as opções que não fazem efeito, como a cor das linhas de constelação quando as linhas estão desligadas.
 - **Moldura:** um retângulo perto das bordas do quadro e o contorno do céu, com cor e espessura ajustáveis.
 - **Textos no pôster:** mensagem, data, hora e coordenadas, com cor e tamanho ajustáveis.

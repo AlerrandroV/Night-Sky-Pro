@@ -58,8 +58,13 @@ var text_color = "#ffffff";
 var text_scale = 1;
 var song_link = "https://open.spotify.com/intl-pt/track/0tgVpDi06FyKpA1z0VMD4v";
 
-var moon_color = "#f00";
-var moon_size = 10;
+// Lua (desenhada na fase do momento escolhido)
+var ck_moon = true;
+var moon_color = "#f4f1e6";
+var moon_scale = 1;
+var ck_moonlabel = true;
+var moonLabel_color = "#cccccc";
+var moonLabel_size = 10;
 
 function draw_star(svg, s) {
 	var mdd = svg.viewBox.baseVal.width / 1500;
@@ -107,30 +112,74 @@ function draw_planet(svg, p) {
 	svg.appendChild(text);
 }
 
-function draw_moon(svg, m) {
+// Desenha a Lua na fase do momento: um disco escuro com a parte iluminada
+// por cima. find_moon fornece:
+//   phase:    elongação em relação ao Sol menos π (0 = cheia, ±π = nova);
+//   posAngle: ângulo de posição do lado iluminado, do norte celeste para leste.
+function draw_moon(svg, m, w, h) {
 	var mdd = svg.viewBox.baseVal.width / 1000;
+	var x = m.pos.x, y = m.pos.y;
+	var r = 9 * moon_scale * mdd;
 
-	if (!m.pos || m.pos.x === undefined || m.pos.y === undefined) {
-		return;
+	// Direções do norte e do leste celestes na tela, no ponto da Lua, para
+	// orientar o lado iluminado do jeito que ele aparece no mapa.
+	var eps = 0.002;
+	var pn = project_radec(m.pos.ra, m.pos.dec + eps, w, h);
+	var pe = project_radec(m.pos.ra + eps, m.pos.dec, w, h);
+	var nx = pn[0] - x, ny = pn[1] - y;
+	var ex = pe[0] - x, ey = pe[1] - y;
+	var nl = Math.hypot(nx, ny) || 1, el = Math.hypot(ex, ey) || 1;
+	var bx = Math.cos(m.posAngle) * nx / nl + Math.sin(m.posAngle) * ex / el;
+	var by = Math.cos(m.posAngle) * ny / nl + Math.sin(m.posAngle) * ey / el;
+	var angle = Math.atan2(by, bx) * 180 / Math.PI;
+
+	// Fração iluminada: 1 na cheia, 0 na nova
+	var k = (1 + Math.cos(m.phase)) / 2;
+	m.illumination = k;
+
+	var g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+	g.setAttribute("transform", "translate(" + x + " " + y + ") rotate(" + angle + ")");
+
+	// Fundo opaco: a Lua esconde as estrelas que estão atrás dela
+	var back = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+	back.setAttribute("r", r);
+	back.setAttribute("fill", sky_color);
+	g.appendChild(back);
+
+	// Disco inteiro, apagado
+	var disk = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+	disk.setAttribute("r", r);
+	disk.setAttribute("fill", moon_color);
+	disk.setAttribute("fill-opacity", 0.15);
+	disk.setAttribute("stroke", moon_color);
+	disk.setAttribute("stroke-opacity", 0.4);
+	disk.setAttribute("stroke-width", r * 0.06);
+	g.appendChild(disk);
+
+	// Parte iluminada: meio disco voltado para o Sol (+x) fechado pelo
+	// terminador, uma meia elipse que vai para o lado escuro na fase gibosa
+	// e para o lado claro na fase crescente/minguante.
+	if (k > 0.005) {
+		var rx = r * Math.abs(2 * k - 1);
+		var lit = document.createElementNS("http://www.w3.org/2000/svg", "path");
+		lit.setAttribute("d",
+			"M0 " + (-r) +
+			"A" + r + " " + r + " 0 0 1 0 " + r +
+			"A" + rx + " " + r + " 0 0 " + (k > 0.5 ? 1 : 0) + " 0 " + (-r) + "Z");
+		lit.setAttribute("fill", moon_color);
+		g.appendChild(lit);
 	}
+	svg.appendChild(g);
 
-	// Desenhar a Lua
-	var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-	circle.setAttribute("cx", m.pos.x);
-	circle.setAttribute("cy", m.pos.y);
-	circle.setAttribute("r", (m.radius || 3) * star_scale * mdd);
-	circle.setAttribute("fill", "url(#moonGradient)");
-	svg.appendChild(circle);
-
-	// Label da Lua
-	var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-	text.setAttribute("x", m.pos.x + (m.radius || 3) + 2);
-	text.setAttribute("y", m.pos.y);
-	text.setAttribute("fill", planetLabel_color || "#ffffff");
-	text.setAttribute("font-size", (planetLabel_size || 10) * mdd);
-	text.setAttribute("font-family", "Arial, sans-serif");
-	text.textContent = "Moon";
-	svg.appendChild(text);
+	if (ck_moonlabel) {
+		var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+		text.setAttribute("x", x + r + 3 * mdd);
+		text.setAttribute("y", y + moonLabel_size * mdd * 0.35);
+		text.setAttribute("fill", moonLabel_color);
+		text.setAttribute("font-size", moonLabel_size * mdd);
+		text.textContent = "Lua";
+		svg.appendChild(text);
+	}
 }
 
 function draw_star_label(svg, p) {
@@ -361,14 +410,22 @@ function draw_sky(svg, w, h) {
 		}
 	}
 
-	// CORREÇÃO: Calcular posição para TODOS os planetas
+	// A Terra (planet[2]) vem primeiro: os outros planetas e a Lua usam a
+	// posição dela, e o Sol é desenhado a partir dela.
+	find_planet(planet[2], planet[2], now.jd);
 	for (var i = 0; ck_planets && i < 9; i++) {
-		find_planet(planet[i], planet[2], now.jd);
+		if (i !== 2) find_planet(planet[i], planet[2], now.jd);
 		skypos_transform(planet[i].pos, now, w, h);
-		
+
 		if (planet[i].pos.visible) {
 			draw_planet(svg, planet[i]);
 		}
+	}
+
+	if (ck_moon) {
+		find_moon(moon, planet[2], now.jd);
+		skypos_transform(moon.pos, now, w, h);
+		if (moon.pos.visible) draw_moon(svg, moon, w, h);
 	}
 
 	if (ck_dsos) {
@@ -738,6 +795,13 @@ var SETTINGS = [
 	["show_planetlab", "ck_planetlabels", "bool"],
 	["planetLabel_color", "planetLabel_color", "color"],
 	["planetLabel_size", "planetLabel_size", "int"],
+
+	["show_moon", "ck_moon", "bool"],
+	["moon_color", "moon_color", "color"],
+	["moon_scale", "moon_scale", "float"],
+	["show_moonlab", "ck_moonlabel", "bool"],
+	["moonLabel_color", "moonLabel_color", "color"],
+	["moonLabel_size", "moonLabel_size", "int"],
 
 	["user_conline", "ck_conlines", "bool"],
 	["conLine_color", "conLine_color", "color"],
