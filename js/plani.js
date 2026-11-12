@@ -6,7 +6,8 @@ var ck_conlines = false;
 var ck_coordinates = true;
 var ck_date = true;
 var ck_time = true;
-var ck_border = true;
+var ck_border = true;        // moldura retangular e contorno do céu
+var border_color = "#ffffff"; // cor comum aos dois perímetros
 
 var sky_color = "#102";
 var star_color = "#fff";
@@ -396,13 +397,13 @@ function build_poster() {
 	var unit = Math.min(W, H);
 	var lineWidth = 0.0025 * unit; // espessura da moldura e do contorno do céu
 
-	// Moldura: retângulo branco a uma pequena distância das bordas do quadro.
+	// Moldura: retângulo a uma pequena distância das bordas do quadro.
 	// Fica dentro da margem do conteúdo, então não encosta no céu nem no texto.
 	if (ck_border) {
 		var inset = 0.035 * unit;
 		svg.appendChild(svg_el("rect", {
 			x: inset, y: inset, width: W - 2 * inset, height: H - 2 * inset,
-			fill: "none", stroke: "#ffffff", "stroke-width": lineWidth
+			fill: "none", stroke: border_color, "stroke-width": lineWidth
 		}));
 	}
 	var texts = poster_texts();
@@ -455,11 +456,13 @@ function build_poster() {
 	sky.appendChild(skyGroup);
 	// Contorno com a mesma espessura da moldura, convertida para as unidades
 	// do céu (o svg do céu é escalado de SKY_SIZE para diameter).
-	var skyLine = diameter ? lineWidth * SKY_SIZE / diameter : 0;
-	sky.appendChild(svg_el("circle", {
-		cx: SKY_SIZE / 2, cy: SKY_SIZE / 2, r: SKY_SIZE / 2 - skyLine / 2,
-		fill: "none", stroke: star_color, "stroke-opacity": 0.35, "stroke-width": skyLine
-	}));
+	if (ck_border && diameter) {
+		var skyLine = lineWidth * SKY_SIZE / diameter;
+		sky.appendChild(svg_el("circle", {
+			cx: SKY_SIZE / 2, cy: SKY_SIZE / 2, r: SKY_SIZE / 2 - skyLine / 2,
+			fill: "none", stroke: border_color, "stroke-width": skyLine
+		}));
+	}
 	svg.appendChild(sky);
 
 	// Textos
