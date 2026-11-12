@@ -18,6 +18,8 @@ Quanto mais personalizável for a arte, melhor.
 - Uma opção que não tem efeito na situação atual fica **oculta**. Exemplo: a espessura das linhas de constelação só aparece com as linhas ligadas. Use `data-show-if="id_do_interruptor"` no `.set-item`; vários ids separados por espaço exigem todos ligados.
 - Toda configuração do pôster é registrada na tabela `SETTINGS` em `js/plani.js`. Ela liga o campo do formulário à variável global. Não leia nem grave campos de configuração fora dela.
 - Textos da interface em português.
+- Ao mudar qualquer arquivo de `css/` ou `js/`, atualize o `?v=` de **todos** os links de CSS e JS no `index.html` (mesmo valor em todos, por exemplo a data com uma letra: `?v=20261112a`). O GitHub Pages deixa esses arquivos em cache por até 10 minutos; sem a versão nova, o navegador mistura o HTML novo com CSS ou JS antigos.
+- Ícones SVG embutidos no HTML levam `width`, `height`, `fill` e `stroke` como atributos, para não depender do CSS para ter o tamanho certo.
 
 ## Textos do pôster
 
