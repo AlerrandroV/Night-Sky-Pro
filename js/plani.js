@@ -394,15 +394,15 @@ function build_poster() {
 
 	// Tamanhos proporcionais ao lado menor, para valer em qualquer formato
 	var unit = Math.min(W, H);
+	var lineWidth = 0.0025 * unit; // espessura da moldura e do contorno do céu
 
 	// Moldura: retângulo branco a uma pequena distância das bordas do quadro.
 	// Fica dentro da margem do conteúdo, então não encosta no céu nem no texto.
 	if (ck_border) {
 		var inset = 0.035 * unit;
-		var stroke = 0.0025 * unit;
 		svg.appendChild(svg_el("rect", {
 			x: inset, y: inset, width: W - 2 * inset, height: H - 2 * inset,
-			fill: "none", stroke: "#ffffff", "stroke-width": stroke
+			fill: "none", stroke: "#ffffff", "stroke-width": lineWidth
 		}));
 	}
 	var texts = poster_texts();
@@ -453,9 +453,12 @@ function build_poster() {
 	var skyGroup = svg_el("g", { "clip-path": "url(#" + clipId + ")" });
 	draw_sky_into(sky, skyGroup);
 	sky.appendChild(skyGroup);
+	// Contorno com a mesma espessura da moldura, convertida para as unidades
+	// do céu (o svg do céu é escalado de SKY_SIZE para diameter).
+	var skyLine = diameter ? lineWidth * SKY_SIZE / diameter : 0;
 	sky.appendChild(svg_el("circle", {
-		cx: SKY_SIZE / 2, cy: SKY_SIZE / 2, r: SKY_SIZE / 2 - 1,
-		fill: "none", stroke: star_color, "stroke-opacity": 0.35, "stroke-width": 2
+		cx: SKY_SIZE / 2, cy: SKY_SIZE / 2, r: SKY_SIZE / 2 - skyLine / 2,
+		fill: "none", stroke: star_color, "stroke-opacity": 0.35, "stroke-width": skyLine
 	}));
 	svg.appendChild(sky);
 
