@@ -723,11 +723,8 @@ function load_spotify_code(uri) {
 	if (spotify_cache[uri]) return;
 	spotify_cache[uri] = { state: "loading" };
 	update_spotify_status();
-	fetch(SPOTIFY_CODE_URL + uri)
-		.then(function (r) {
-			if (!r.ok) throw new Error("HTTP " + r.status);
-			return r.text();
-		})
+	fetch_ok(SPOTIFY_CODE_URL + uri)
+		.then(function (r) { return r.text(); })
 		.then(function (text) {
 			var doc = new DOMParser().parseFromString(text, "image/svg+xml");
 			var root = doc.documentElement;
@@ -862,8 +859,10 @@ function closePosterZoom(event) {
 	document.getElementById("poster-zoom").classList.remove("open");
 }
 
+// Esc fecha qualquer janela sobreposta aberta (quadro ampliado, mapa)
 document.addEventListener("keydown", function (e) {
-	if (e.key === "Escape") document.getElementById("poster-zoom").classList.remove("open");
+	if (e.key !== "Escape") return;
+	document.querySelectorAll(".overlay.open").forEach(function (el) { el.classList.remove("open"); });
 });
 
 function poster_filename(ext) {
@@ -1116,23 +1115,13 @@ function canvasApp() {
 	// Qualquer mudança no painel atualiza o pôster
 	document.getElementById("controls").addEventListener("change", function (e) {
 		if (e.target.id === "frame_format") toggleCustomSize();
-		if (e.target.id === "place_search") return; // a busca aplica o local ao escolher uma sugestão
-		// Coordenadas digitadas à mão: o nome do local anterior deixa de valer
-		if (e.target.id === "user_lat" || e.target.id === "user_lon") {
-			document.getElementById("place_name").value = "";
-			document.getElementById("place_search").value = "";
-		}
 		update_visibility();
 		get_user_obs();
 	});
 }
 
 function setGeoPos(geopos) {
-	document.getElementById("user_lat").value = geopos.coords.latitude;
-	document.getElementById("user_lon").value = geopos.coords.longitude;
-	document.getElementById("place_search").value = "";
-	get_user_obs();
-	fill_place_name(geopos.coords.latitude, geopos.coords.longitude);
+	pick_point(geopos.coords.latitude, geopos.coords.longitude);
 }
 
 function errGeoPos(error) {

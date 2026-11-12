@@ -19,6 +19,14 @@ var FONT_PRESETS = [
 ];
 
 var CUSTOM_FONT_ID = "custom";
+
+// fetch que rejeita respostas de erro (4xx/5xx), não só falhas de rede
+function fetch_ok(url, opts) {
+	return fetch(url, opts).then(function (r) {
+		if (!r.ok) throw new Error("HTTP " + r.status);
+		return r;
+	});
+}
 var font_cache = {};    // id -> { state: "loading" | "ok" | "error", font, promise }
 var custom_font = null; // { name, font } da fonte importada ou do dafont
 
@@ -31,11 +39,8 @@ function load_font(id) {
 	if (!preset) return Promise.resolve(null);
 
 	var entry = { state: "loading" };
-	entry.promise = fetch(preset.file)
-		.then(function (r) {
-			if (!r.ok) throw new Error("HTTP " + r.status);
-			return r.arrayBuffer();
-		})
+	entry.promise = fetch_ok(preset.file)
+		.then(function (r) { return r.arrayBuffer(); })
 		.then(function (buf) {
 			entry.font = opentype.parse(buf);
 			entry.state = "ok";
@@ -221,11 +226,8 @@ function fetch_first(urls) {
 	function next() {
 		if (i >= urls.length) return Promise.reject(new Error("todas as tentativas falharam"));
 		var u = urls[i++];
-		return fetch(u)
-			.then(function (r) {
-				if (!r.ok) throw new Error("HTTP " + r.status);
-				return r.arrayBuffer();
-			})
+		return fetch_ok(u)
+			.then(function (r) { return r.arrayBuffer(); })
 			.then(function (buf) {
 				var b = new Uint8Array(buf, 0, 2);
 				if (b[0] !== 0x50 || b[1] !== 0x4b) throw new Error("resposta não é um .zip");
