@@ -1,37 +1,65 @@
 var clipped = false;
-var ck_starlabels = true;
-var ck_conlabels = false;
-var ck_dsos = false;
-var ck_conlines = false;
-var ck_coordinates = true;
-var ck_date = true;
-var ck_time = true;
-var ck_border = true;        // moldura retangular e contorno do céu
-var border_color = "#ffffff"; // cor comum aos dois perímetros
-var ck_grid = false;          // grade equatorial (meridianos e paralelos)
 
-var sky_color = "#102";
-var star_color = "#fff";
-var star_scale = 1;
-var starLabel_color = "#888";
-var starLabel_size = 10;
-var planetLabel_color = "#888";
-var planetLabel_size = 10;
-var conLine_color = "#ccc";
-var conLine_scale = 1;
-var conLabel_color = "#789";
-var conLabel_size = 10;
-var dsoLabel_color = "#0f0";
-var dsoLabel_size = 5;
+// ===== Configurações do pôster (valores padrão) =====
+// Cada uma é ligada a um campo do formulário pela tabela SETTINGS, mais abaixo.
 
+// Quadro
+var bg_color = "#110022";
 var frame_format = "A4";
 var frame_custom = { w: 21, h: 29.7 };
 
+// Moldura retangular e contorno do céu
+var ck_border = true;
+var border_color = "#ffffff";
+var border_scale = 1;
+
+// Céu e estrelas
+var sky_color = "#110022";
+var star_color = "#ffffff";
+var star_scale = 1;
+var ck_starlabels = true;
+var starLabel_color = "#888888";
+var starLabel_size = 10;
+
+// Planetas
+var ck_planets = true;
+var planet_scale = 1;
+var ck_planetlabels = true;
+var planetLabel_color = "#cccccc";
+var planetLabel_size = 10;
+
+// Constelações
+var ck_conlines = false;
+var conLine_color = "#cccccc";
+var conLine_scale = 1;
+var ck_conlabels = false;
+var conLabel_color = "#778899";
+var conLabel_size = 10;
+
+// Objetos de céu profundo
+var ck_dsos = false;
+var dsoLabel_color = "#00ff00";
+var dsoLabel_size = 5;
+
+// Grade de coordenadas equatoriais
+var ck_grid = false;
+var grid_color = "#ffffff";
+var grid_scale = 1;
+var ck_gridlabels = true;
+var gridLabel_color = "#ffffff";
+var gridLabel_size = 10;
+
+// Textos
+var message = "The best night of our lives";
+var ck_date = true;
+var ck_time = true;
+var ck_coordinates = true;
+var text_color = "#ffffff";
+var text_scale = 1;
+var song_link = "https://open.spotify.com/intl-pt/track/0tgVpDi06FyKpA1z0VMD4v";
+
 var moon_color = "#f00";
 var moon_size = 10;
-
-var message = "The best night of our lives";
-var song_link = "https://open.spotify.com/intl-pt/track/0tgVpDi06FyKpA1z0VMD4v";
 
 function draw_star(svg, s) {
 	var mdd = svg.viewBox.baseVal.width / 1500;
@@ -63,15 +91,17 @@ function draw_planet(svg, p) {
 	var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
 	circle.setAttribute("cx", p.pos.x);
 	circle.setAttribute("cy", p.pos.y);
-	circle.setAttribute("r", 3 * mdd); // raio do planeta (ajuste conforme a escala)
+	circle.setAttribute("r", 3 * planet_scale * mdd);
 	circle.setAttribute("fill", p.color);
 	svg.appendChild(circle);
 
+	if (!ck_planetlabels) return;
+
 	// === Desenhar o label ===
 	var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-	text.setAttribute("x", p.pos.x + 5);
+	text.setAttribute("x", p.pos.x + (3 * planet_scale + 2) * mdd);
 	text.setAttribute("y", p.pos.y);
-	text.setAttribute("fill", p.color);
+	text.setAttribute("fill", planetLabel_color);
 	text.setAttribute("font-size", planetLabel_size * mdd);
 	text.textContent = p.name === "Earth" ? "Sun" : p.name;
 	svg.appendChild(text);
@@ -239,12 +269,12 @@ function draw_grid(svg, w, h) {
 	var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
 	path.setAttribute("d", d);
 	path.setAttribute("fill", "none");
-	path.setAttribute("stroke", border_color);
+	path.setAttribute("stroke", grid_color);
 	path.setAttribute("stroke-opacity", 0.3);
-	path.setAttribute("stroke-width", w / 1000);
+	path.setAttribute("stroke-width", w / 1000 * grid_scale);
 	svg.appendChild(path);
 
-	draw_grid_labels(svg, w, h);
+	if (ck_gridlabels) draw_grid_labels(svg, w, h);
 }
 
 // Rótulos da grade: as horas de ascensão reta ao longo do equador celeste e as
@@ -253,7 +283,7 @@ function draw_grid(svg, w, h) {
 function draw_grid_labels(svg, w, h) {
 	var DEG = Math.PI / 180;
 	var radius = Math.min(w, h) / 2;
-	var size = w / 75;
+	var size = gridLabel_size * w / 750;
 
 	function inside(p) {
 		return Math.hypot(p[0] - w / 2, p[1] - h / 2) < radius - size * 1.5;
@@ -263,7 +293,7 @@ function draw_grid_labels(svg, w, h) {
 		var t = document.createElementNS("http://www.w3.org/2000/svg", "text");
 		t.setAttribute("x", p[0] + dx);
 		t.setAttribute("y", p[1] + dy);
-		t.setAttribute("fill", border_color);
+		t.setAttribute("fill", gridLabel_color);
 		t.setAttribute("fill-opacity", 0.6);
 		t.setAttribute("font-size", size);
 		t.setAttribute("text-anchor", anchor);
@@ -332,7 +362,7 @@ function draw_sky(svg, w, h) {
 	}
 
 	// CORREÇÃO: Calcular posição para TODOS os planetas
-	for (var i = 0; i < 9; i++) {
+	for (var i = 0; ck_planets && i < 9; i++) {
 		find_planet(planet[i], planet[2], now.jd);
 		skypos_transform(planet[i].pos, now, w, h);
 		
@@ -482,11 +512,11 @@ function build_poster() {
 		viewBox: "0 0 " + W + " " + H,
 		"font-family": POSTER_FONT
 	});
-	svg.appendChild(svg_el("rect", { x: 0, y: 0, width: W, height: H, fill: sky_color }));
+	svg.appendChild(svg_el("rect", { x: 0, y: 0, width: W, height: H, fill: bg_color }));
 
 	// Tamanhos proporcionais ao lado menor, para valer em qualquer formato
 	var unit = Math.min(W, H);
-	var lineWidth = 0.0025 * unit; // espessura da moldura e do contorno do céu
+	var lineWidth = 0.0025 * unit * border_scale; // moldura e contorno do céu
 
 	// Moldura: retângulo a uma pequena distância das bordas do quadro.
 	// Fica dentro da margem do conteúdo, então não encosta no céu nem no texto.
@@ -498,8 +528,8 @@ function build_poster() {
 		}));
 	}
 	var texts = poster_texts();
-	var msgSize = 0.045 * unit;
-	var detSize = 0.024 * unit;
+	var msgSize = 0.045 * unit * text_scale;
+	var detSize = 0.024 * unit * text_scale;
 	var gap = 0.06 * unit;
 	var hasText = texts.message || texts.details.length;
 
@@ -561,7 +591,7 @@ function build_poster() {
 	for (var i = 0; i < msgLines.length; i++) {
 		y += msgSize;
 		var t = svg_el("text", {
-			x: textX, y: y, "text-anchor": "middle", fill: star_color,
+			x: textX, y: y, "text-anchor": "middle", fill: text_color,
 			"font-size": msgSize, "font-family": POSTER_FONT, "font-weight": 300
 		});
 		t.textContent = msgLines[i];
@@ -572,7 +602,7 @@ function build_poster() {
 	for (var j = 0; j < texts.details.length; j++) {
 		y += detSize * 1.6;
 		var d = svg_el("text", {
-			x: textX, y: y, "text-anchor": "middle", fill: star_color,
+			x: textX, y: y, "text-anchor": "middle", fill: text_color,
 			"fill-opacity": 0.75, "font-size": detSize, "font-family": POSTER_FONT,
 			"letter-spacing": detSize * 0.08
 		});
@@ -686,39 +716,102 @@ function saveAsVector() {
 	download_blob(blob, poster_filename("svg"));
 }
 
-function set_user_obs() {
-	// atualiza o formulário com os valores atuais das variáveis globais
-	document.getElementById("resolution").value = resolution;
+// Tabela de configurações: [id do campo, variável global, tipo].
+// Tipos: "bool" (interruptor), "color", "float", "int", "text".
+var SETTINGS = [
+	["bg_color", "bg_color", "color"],
+	["resolution", "resolution", "int"],
 
-	document.getElementById("sky_color").value = sky_color;
-	document.getElementById("star_scale").value = star_scale;
-	document.getElementById("star_color").value = star_color;
-	document.getElementById("starLabel_size").value = starLabel_size;
-	document.getElementById("starLabel_color").value = starLabel_color;
-	document.getElementById("planetLabel_size").value = planetLabel_size;
-	document.getElementById("conLine_scale").value = conLine_scale;
-	document.getElementById("conLine_color").value = conLine_color;
-	document.getElementById("conLabel_size").value = conLabel_size;
-	document.getElementById("conLabel_color").value = conLabel_color;
-	document.getElementById("dsoLabel_size").value = dsoLabel_size;
-	document.getElementById("dsoLabel_color").value = dsoLabel_color;
+	["show_border", "ck_border", "bool"],
+	["border_color", "border_color", "color"],
+	["border_scale", "border_scale", "float"],
+
+	["sky_color", "sky_color", "color"],
+	["star_color", "star_color", "color"],
+	["star_scale", "star_scale", "float"],
+	["user_starlab", "ck_starlabels", "bool"],
+	["starLabel_color", "starLabel_color", "color"],
+	["starLabel_size", "starLabel_size", "int"],
+
+	["show_planets", "ck_planets", "bool"],
+	["planet_scale", "planet_scale", "float"],
+	["show_planetlab", "ck_planetlabels", "bool"],
+	["planetLabel_color", "planetLabel_color", "color"],
+	["planetLabel_size", "planetLabel_size", "int"],
+
+	["user_conline", "ck_conlines", "bool"],
+	["conLine_color", "conLine_color", "color"],
+	["conLine_scale", "conLine_scale", "float"],
+	["user_conlab", "ck_conlabels", "bool"],
+	["conLabel_color", "conLabel_color", "color"],
+	["conLabel_size", "conLabel_size", "int"],
+
+	["user_dsos", "ck_dsos", "bool"],
+	["dsoLabel_color", "dsoLabel_color", "color"],
+	["dsoLabel_size", "dsoLabel_size", "int"],
+
+	["show_grid", "ck_grid", "bool"],
+	["grid_color", "grid_color", "color"],
+	["grid_scale", "grid_scale", "float"],
+	["show_gridlab", "ck_gridlabels", "bool"],
+	["gridLabel_color", "gridLabel_color", "color"],
+	["gridLabel_size", "gridLabel_size", "int"],
+
+	["user_message", "message", "text"],
+	["show_date", "ck_date", "bool"],
+	["show_time", "ck_time", "bool"],
+	["show_coordinates", "ck_coordinates", "bool"],
+	["text_color", "text_color", "color"],
+	["text_scale", "text_scale", "float"],
+	["user_music", "song_link", "text"]
+];
+
+// Grava os valores das variáveis globais no formulário
+function set_user_obs() {
+	SETTINGS.forEach(function (st) {
+		var el = document.getElementById(st[0]);
+		var v = window[st[1]];
+		if (!el) return;
+		if (st[2] === "bool") el.checked = v;
+		else if (st[2] === "color" && el.jscolor) el.jscolor.fromString(v);
+		else el.value = v;
+	});
 	document.getElementById("frame_format").value = frame_format;
 	document.getElementById("custom_width").value = frame_custom.w;
 	document.getElementById("custom_height").value = frame_custom.h;
 	toggleCustomSize();
+	update_visibility();
+}
 
-	document.getElementById("user_starlab").checked = ck_starlabels;
-	document.getElementById("user_conlab").checked = ck_conlabels;
-	document.getElementById("user_dsos").checked = ck_dsos;
-	document.getElementById("user_conline").checked = ck_conlines;
-	document.getElementById("show_coordinates").checked = ck_coordinates;
-	document.getElementById("show_date").checked = ck_date;
-	document.getElementById("show_time").checked = ck_time;
-	document.getElementById("show_border").checked = ck_border;
-	document.getElementById("show_grid").checked = ck_grid;
+// Lê o formulário para as variáveis globais (valores inválidos são ignorados)
+function read_settings() {
+	SETTINGS.forEach(function (st) {
+		var el = document.getElementById(st[0]);
+		if (!el) return;
+		var v;
+		switch (st[2]) {
+			case "bool": v = el.checked; break;
+			case "float": v = parseFloat(el.value); if (!(v > 0)) return; break;
+			case "int": v = parseInt(el.value, 10); if (!(v > 0)) return; break;
+			case "color": v = el.value.trim(); if (!v) return; if (v[0] !== "#") v = "#" + v; break;
+			default: v = el.value;
+		}
+		window[st[1]] = v;
+	});
+	if (resolution < 256) resolution = 256;
+}
 
-	document.getElementById("user_message").value = message;
-	document.getElementById("user_music").value = song_link;
+// Mostra só as opções que fazem efeito: um item com data-show-if="a b"
+// aparece apenas se os interruptores a e b estiverem ligados.
+function update_visibility() {
+	document.querySelectorAll("[data-show-if]").forEach(function (el) {
+		var ids = el.getAttribute("data-show-if").split(/\s+/);
+		var show = ids.every(function (id) {
+			var cb = document.getElementById(id);
+			return cb && cb.checked;
+		});
+		el.style.display = show ? "" : "none";
+	});
 }
 
 function get_user_obs() {
@@ -734,71 +827,29 @@ function get_user_obs() {
 	var dp = dt.value.split("-").map(Number);
 	var tp = hr.value.split(":").map(Number);
 	if (dp.length !== 3 || dp.some(isNaN)) {
-		alert("Your browser doesn't think\n'" + dt.value + "'\nis a valid date.");
+		alert("Data inválida: '" + dt.value + "'. Use o formato AAAA-MM-DD.");
 		set_user_obs();
 		return;
 	}
 	if (tp.length < 2 || isNaN(tp[0]) || isNaN(tp[1])) {
-		alert("Invalid time format. Please use HH:MM.");
+		alert("Hora inválida. Use o formato HH:MM.");
 		set_user_obs();
 		return;
 	}
 	var d = new Date(dp[0], dp[1] - 1, dp[2], tp[0], tp[1]);
 
 	frame_format = document.getElementById("frame_format").value;
-
 	if (frame_format === "custom") {
 		var w = parseFloat(document.getElementById("custom_width").value);
 		var h = parseFloat(document.getElementById("custom_height").value);
-		if (w >= 5 && h >= 5) {
-			frame_custom = {
-				w: w,
-				h: h
-			};
-		}
+		if (w >= 5 && h >= 5) frame_custom = { w: w, h: h };
 	}
 
 	now.setDate(d);
+	if (lon.value >= -180 && lon.value < 180) now.setLonDegrees(lon.value);
+	if (lat.value >= -90 && lat.value <= 90) now.setLatDegrees(lat.value);
 
-	if (lon.value >= -180 && lon.value < 180)
-		now.setLonDegrees(lon.value);
-
-	if (lat.value >= -90 && lat.value <= 90)
-		now.setLatDegrees(lat.value);
-
-	// checkboxes
-	ck_starlabels = document.getElementById("user_starlab").checked;
-	ck_conlabels = document.getElementById("user_conlab").checked;
-	ck_dsos = document.getElementById("user_dsos").checked;
-	ck_conlines = document.getElementById("user_conline").checked;
-	ck_coordinates = document.getElementById("show_coordinates").checked;
-	ck_date = document.getElementById("show_date").checked;
-	ck_time = document.getElementById("show_time").checked;
-	ck_border = document.getElementById("show_border").checked;
-	ck_grid = document.getElementById("show_grid").checked;
-
-	// cores, escalas e tamanhos
-	sky_color = document.getElementById("sky_color").value;
-	star_scale = parseFloat(document.getElementById("star_scale").value);
-	star_color = document.getElementById("star_color").value;
-	starLabel_size = parseInt(document.getElementById("starLabel_size").value);
-	starLabel_color = document.getElementById("starLabel_color").value;
-	planetLabel_size = parseInt(document.getElementById("planetLabel_size").value);
-	conLine_scale = parseFloat(document.getElementById("conLine_scale").value);
-	conLine_color = document.getElementById("conLine_color").value;
-	conLabel_size = parseInt(document.getElementById("conLabel_size").value);
-	conLabel_color = document.getElementById("conLabel_color").value;
-	dsoLabel_size = parseInt(document.getElementById("dsoLabel_size").value);
-	dsoLabel_color = document.getElementById("dsoLabel_color").value;
-
-	// mensagens
-	message = document.getElementById("user_message").value;
-	song_link = document.getElementById("user_music").value;
-
-	// resolução do PNG (lado maior, em pixels)
-	var res = parseInt(document.getElementById("resolution").value);
-	if (res >= 256) resolution = res;
-
+	read_settings();
 	set_user_obs();
 	refresh();
 }
@@ -810,13 +861,19 @@ function canvasApp() {
 	now = new Observer();
 	set_user_obs();
 	get_user_obs(); // aplica a data e o local do formulário já na abertura
+
+	// Qualquer mudança no painel atualiza o pôster
+	document.getElementById("controls").addEventListener("change", function (e) {
+		if (e.target.id === "frame_format") toggleCustomSize();
+		update_visibility();
+		get_user_obs();
+	});
 }
 
 function setGeoPos(geopos) {
 	document.getElementById("user_lat").value = geopos.coords.latitude;
 	document.getElementById("user_lon").value = geopos.coords.longitude;
-	set_user_obs();
-	refresh();
+	get_user_obs();
 }
 
 function errGeoPos(error) {
@@ -839,6 +896,7 @@ function currentTime() {
 
 	var timeString = now.toTimeString().split(' ')[0].substring(0, 5);
 	document.getElementById("user_time").value = timeString;
+	get_user_obs();
 }
 
 function toggleCustomSize() {
@@ -846,7 +904,3 @@ function toggleCustomSize() {
 	document.getElementById("custom_size").style.display = custom ? "flex" : "none";
 }
 
-function onFrameFormatChange() {
-	toggleCustomSize();
-	get_user_obs();
-}
