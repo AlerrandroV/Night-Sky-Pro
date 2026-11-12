@@ -4,16 +4,19 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1">
 	<title>NightSky Enhanced</title>
-	<link rel="stylesheet" href="css/plani.css?v=20261112a">
-	<script src="js/astro.js?v=20261112a"></script>
-	<script src="js/observer.js?v=20261112a"></script>
-	<script src="js/skypos.js?v=20261112a"></script>
-	<script src="js/skydb.js?v=20261112a"></script>
-	<script src="js/lib/opentype.min.js?v=20261112a"></script>
-	<script src="js/lib/jszip.min.js?v=20261112a"></script>
-	<script src="js/fonts.js?v=20261112a"></script>
-	<script src="js/plani.js?v=20261112a"></script>
-	<script src="js/jscolor.js?v=20261112a"></script>
+	<link rel="stylesheet" href="js/lib/leaflet/leaflet.css?v=20261112b">
+	<link rel="stylesheet" href="css/plani.css?v=20261112b">
+	<script src="js/astro.js?v=20261112b"></script>
+	<script src="js/observer.js?v=20261112b"></script>
+	<script src="js/skypos.js?v=20261112b"></script>
+	<script src="js/skydb.js?v=20261112b"></script>
+	<script src="js/lib/opentype.min.js?v=20261112b"></script>
+	<script src="js/lib/jszip.min.js?v=20261112b"></script>
+	<script src="js/lib/leaflet/leaflet.js?v=20261112b"></script>
+	<script src="js/fonts.js?v=20261112b"></script>
+	<script src="js/location.js?v=20261112b"></script>
+	<script src="js/plani.js?v=20261112b"></script>
+	<script src="js/jscolor.js?v=20261112b"></script>
 	<script>
 		window.addEventListener("load", canvasApp, false);
 
@@ -46,12 +49,24 @@
 
 			<details class="group" open>
 				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>Local</span></summary>
-				<div id="location-inputs">
-					<input type="number" id="user_lat" value="-1.3529019" placeholder="Latitude"
-					onfocus="(this.placeholder='Ex.: -23.5505')" onblur="(this.placeholder='Latitude')">
-					<input type="number" id="user_lon" value="-48.3882851" placeholder="Longitude"
-					onfocus="(this.placeholder='Ex.: -46.6333')" onblur="(this.placeholder='Longitude')">
+				<div class="search-box">
+					<input type="search" id="place_search" placeholder="Buscar cidade, rua ou endereço" autocomplete="off"
+					oninput="on_place_search_input()" onkeydown="on_place_search_key(event)" onblur="on_place_search_blur()">
+					<ul id="place_suggestions" role="listbox" hidden></ul>
+				</div>
+				<div class="button-row">
+					<input id="mappick" type="button" value="Selecionar no mapa" onclick="open_map_picker()">
 					<input id="geoloc" type="button" value="Minha localização" onclick="getGeoPos()">
+				</div>
+				<div class="set-item">
+					Nome do local
+					<input id="place_name" type="text" placeholder="Ex.: Belém, Pará, Brasil">
+				</div>
+				<div id="location-inputs">
+					<input type="number" id="user_lat" value="-1.3529019" placeholder="Latitude" step="any"
+					onfocus="(this.placeholder='Ex.: -23.5505')" onblur="(this.placeholder='Latitude')">
+					<input type="number" id="user_lon" value="-48.3882851" placeholder="Longitude" step="any"
+					onfocus="(this.placeholder='Ex.: -46.6333')" onblur="(this.placeholder='Longitude')">
 				</div>
 			</details>
 
@@ -274,6 +289,10 @@
 					<input id="user_message" type="text" placeholder="Deixe vazio para não mostrar">
 				</div>
 				<div class="set-item">
+					Nome do local
+					<label class="switch"><input id="show_place" type="checkbox"><span class="slider"></span></label>
+				</div>
+				<div class="set-item">
 					Data
 					<label class="switch"><input id="show_date" type="checkbox"><span class="slider"></span></label>
 				</div>
@@ -360,6 +379,18 @@
 			</div>
 		</section>
 
+	</div>
+
+	<!-- Janela para escolher o local no mapa -->
+	<div id="map-modal" role="dialog" aria-modal="true" aria-labelledby="map-title">
+		<div class="map-card">
+			<p id="map-title">Toque no mapa ou arraste o marcador até o local</p>
+			<div id="map"></div>
+			<div class="map-actions">
+				<button type="button" class="secondary" onclick="close_map_picker()">Cancelar</button>
+				<button type="button" onclick="confirm_map_picker()">Confirmar</button>
+			</div>
+		</div>
 	</div>
 
 	<!-- Visualização do quadro em tela cheia -->

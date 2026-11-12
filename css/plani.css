@@ -513,3 +513,145 @@ details.group hr {
 	stroke-linecap: round;
 	stroke-linejoin: round;
 }
+
+/* Local: busca com sugestões e botões */
+.search-box {
+	position: relative;
+	margin-bottom: 6px;
+}
+
+#place_search {
+	width: 100%;
+	max-width: none;
+	background-color: #fff;
+	color: #000;
+	border: 1px solid #ccc;
+	padding: 10px 12px;
+	border-radius: 8px;
+	font-size: 15px;
+}
+
+#place_suggestions {
+	list-style: none;
+	margin-top: 4px;
+	border: 1px solid #e0e0e6;
+	border-radius: 8px;
+	overflow: hidden;
+	background: #fff;
+	box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+
+#place_suggestions li {
+	padding: 10px 12px;
+	font-size: 14px;
+	line-height: 1.35;
+	cursor: pointer;
+	border-bottom: 1px solid #f0f0f3;
+}
+
+#place_suggestions li:last-child {
+	border-bottom: none;
+}
+
+#place_suggestions li:hover,
+#place_suggestions li.active {
+	background: #f1e8ff;
+}
+
+#place_suggestions li.info {
+	color: #777;
+	cursor: default;
+	background: none;
+}
+
+.button-row {
+	display: flex;
+	gap: 6px;
+	margin-bottom: 6px;
+}
+
+.button-row input[type="button"] {
+	flex: 1;
+}
+
+#place_name {
+	flex: 1;
+	max-width: 60%;
+}
+
+/* Janela do mapa */
+#map-modal {
+	position: fixed;
+	inset: 0;
+	z-index: 200;
+	background: rgba(10, 10, 16, 0.6);
+	display: none;
+	align-items: center;
+	justify-content: center;
+	padding: 16px;
+}
+
+#map-modal.open {
+	display: flex;
+}
+
+.map-card {
+	background: #fff;
+	border-radius: 12px;
+	width: 100%;
+	max-width: 720px;
+	height: min(80dvh, 640px);
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+
+#map-title {
+	padding: 12px 16px;
+	font-size: 14px;
+	color: #333;
+}
+
+#map {
+	flex: 1;
+	min-height: 0;
+}
+
+.map-actions {
+	display: flex;
+	gap: 10px;
+	padding: 12px 16px;
+	justify-content: flex-end;
+}
+
+.map-actions button {
+	border: none;
+	border-radius: 8px;
+	padding: 10px 18px;
+	font-size: 15px;
+	font-weight: 500;
+	cursor: pointer;
+	background: #6200ee;
+	color: #fff;
+}
+
+.map-actions button.secondary {
+	background: #ececf1;
+	color: #333;
+}
+
+/* Marcador do mapa (sem imagens) */
+.map-pin span {
+	position: absolute;
+	left: 50%;
+	top: 0;
+	width: 24px;
+	height: 24px;
+	margin-left: -12px;
+	background: #6200ee;
+	border: 3px solid #fff;
+	border-radius: 50% 50% 50% 0;
+	transform: rotate(-45deg);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
