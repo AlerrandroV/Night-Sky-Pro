@@ -12,6 +12,7 @@ var frame_custom = { w: 21, h: 29.7 };
 var ck_border = true;
 var border_color = "#ffffff";
 var border_scale = 1;
+var border_opacity = 100;     // opacidade da moldura e do contorno, em %
 
 // Céu e estrelas
 var sky_color = "#110022";
@@ -583,7 +584,8 @@ function build_poster() {
 		var inset = 0.035 * unit;
 		svg.appendChild(svg_el("rect", {
 			x: inset, y: inset, width: W - 2 * inset, height: H - 2 * inset,
-			fill: "none", stroke: border_color, "stroke-width": lineWidth
+			fill: "none", stroke: border_color, "stroke-width": lineWidth,
+			"stroke-opacity": border_opacity / 100
 		}));
 	}
 	var texts = poster_texts();
@@ -640,7 +642,8 @@ function build_poster() {
 		var skyLine = lineWidth * SKY_SIZE / diameter;
 		sky.appendChild(svg_el("circle", {
 			cx: SKY_SIZE / 2, cy: SKY_SIZE / 2, r: SKY_SIZE / 2 - skyLine / 2,
-			fill: "none", stroke: border_color, "stroke-width": skyLine
+			fill: "none", stroke: border_color, "stroke-width": skyLine,
+			"stroke-opacity": border_opacity / 100
 		}));
 	}
 	svg.appendChild(sky);
@@ -784,6 +787,7 @@ var SETTINGS = [
 	["show_border", "ck_border", "bool"],
 	["border_color", "border_color", "color"],
 	["border_scale", "border_scale", "float"],
+	["border_opacity", "border_opacity", "percent"],
 
 	["sky_color", "sky_color", "color"],
 	["star_color", "star_color", "color"],
