@@ -4,19 +4,17 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1">
 	<title>NightSky Enhanced</title>
-	<link rel="stylesheet" href="js/lib/leaflet/leaflet.css?v=20261112b">
-	<link rel="stylesheet" href="css/plani.css?v=20261112b">
-	<script src="js/astro.js?v=20261112b"></script>
-	<script src="js/observer.js?v=20261112b"></script>
-	<script src="js/skypos.js?v=20261112b"></script>
-	<script src="js/skydb.js?v=20261112b"></script>
-	<script src="js/lib/opentype.min.js?v=20261112b"></script>
-	<script src="js/lib/jszip.min.js?v=20261112b"></script>
-	<script src="js/lib/leaflet/leaflet.js?v=20261112b"></script>
-	<script src="js/fonts.js?v=20261112b"></script>
-	<script src="js/location.js?v=20261112b"></script>
-	<script src="js/plani.js?v=20261112b"></script>
-	<script src="js/jscolor.js?v=20261112b"></script>
+	<link rel="stylesheet" href="css/plani.css?v=20261112c">
+	<script src="js/astro.js?v=20261112c"></script>
+	<script src="js/observer.js?v=20261112c"></script>
+	<script src="js/skypos.js?v=20261112c"></script>
+	<script src="js/skydb.js?v=20261112c"></script>
+	<script src="js/lib/opentype.min.js?v=20261112c"></script>
+	<script src="js/lib/jszip.min.js?v=20261112c"></script>
+	<script src="js/fonts.js?v=20261112c"></script>
+	<script src="js/location.js?v=20261112c"></script>
+	<script src="js/plani.js?v=20261112c"></script>
+	<script src="js/jscolor.js?v=20261112c"></script>
 	<script>
 		window.addEventListener("load", canvasApp, false);
 
@@ -382,19 +380,19 @@
 	</div>
 
 	<!-- Janela para escolher o local no mapa -->
-	<div id="map-modal" role="dialog" aria-modal="true" aria-labelledby="map-title">
+	<div id="map-modal" class="overlay" role="dialog" aria-modal="true" aria-labelledby="map-title">
 		<div class="map-card">
 			<p id="map-title">Toque no mapa ou arraste o marcador até o local</p>
 			<div id="map"></div>
 			<div class="map-actions">
-				<button type="button" class="secondary" onclick="close_map_picker()">Cancelar</button>
-				<button type="button" onclick="confirm_map_picker()">Confirmar</button>
+				<input type="button" class="secondary" value="Cancelar" onclick="close_map_picker()">
+				<input type="button" value="Confirmar" onclick="confirm_map_picker()">
 			</div>
 		</div>
 	</div>
 
 	<!-- Visualização do quadro em tela cheia -->
-	<div id="poster-zoom" onclick="closePosterZoom(event)">
+	<div id="poster-zoom" class="overlay" onclick="closePosterZoom(event)">
 		<button id="poster-zoom-close" type="button" aria-label="Fechar">✕</button>
 	</div>
 </body>
