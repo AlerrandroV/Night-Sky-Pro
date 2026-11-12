@@ -8,6 +8,7 @@ var ck_date = true;
 var ck_time = true;
 var ck_border = true;        // moldura retangular e contorno do céu
 var border_color = "#ffffff"; // cor comum aos dois perímetros
+var ck_grid = false;          // grade equatorial (meridianos e paralelos)
 
 var sky_color = "#102";
 var star_color = "#fff";
@@ -196,6 +197,54 @@ function draw_dso(svg, m) {
 	if (shape) svg.appendChild(shape);
 }
 
+// Projeta (ascensão reta, declinação J2000, em radianos) no disco do céu com a
+// mesma projeção de skypos_transform, mas também para pontos abaixo do
+// horizonte: eles caem fora do círculo e são cortados pelo recorte do céu.
+function project_radec(ra, dec, w, h) {
+	var coord = [ra, dec];
+	Astro.precess(Astro.JD_J2000, now.jd, coord);
+	coord[0] = now.lst - coord[0];
+	Astro.aa_hadec(now.latitude, coord, coord);
+	var tmp = 0.5 - coord[1] / Math.PI;
+	return [w * (0.5 - tmp * Math.sin(coord[0])), h * (0.5 - tmp * Math.cos(coord[0]))];
+}
+
+function grid_path(points) {
+	var d = "";
+	for (var i = 0; i < points.length; i++) {
+		d += (i ? "L" : "M") + points[i][0].toFixed(2) + " " + points[i][1].toFixed(2);
+	}
+	return d;
+}
+
+// Grade de coordenadas equatoriais: meridianos (círculos horários) a cada
+// 1 h de ascensão reta e paralelos de declinação a cada 15°.
+function draw_grid(svg, w, h) {
+	var DEG = Math.PI / 180;
+	var d = "";
+	for (var hr = 0; hr < 24; hr++) {
+		var ra = hr * 15 * DEG;
+		// Só os meridianos de 0, 6, 12 e 18 h chegam aos polos; os demais param
+		// no último paralelo, para não formar um borrão onde todos se encontram.
+		var lim = hr % 6 === 0 ? 90 : 75;
+		var pts = [];
+		for (var dec = -lim; dec <= lim; dec += 2.5) pts.push(project_radec(ra, dec * DEG, w, h));
+		d += grid_path(pts);
+	}
+	for (var dc = -75; dc <= 75; dc += 15) {
+		var pts2 = [];
+		for (var r = 0; r <= 360; r += 2) pts2.push(project_radec(r * DEG, dc * DEG, w, h));
+		d += grid_path(pts2);
+	}
+	var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+	path.setAttribute("d", d);
+	path.setAttribute("fill", "none");
+	path.setAttribute("stroke", border_color);
+	path.setAttribute("stroke-opacity", 0.3);
+	path.setAttribute("stroke-width", w / 1000);
+	svg.appendChild(path);
+}
+
 function draw_sky(svg, w, h) {
 	var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
 	var radius = Math.min(w, h) / 2;
@@ -204,6 +253,8 @@ function draw_sky(svg, w, h) {
 	circle.setAttribute("r", radius);
 	circle.setAttribute("fill", sky_color);
 	svg.appendChild(circle);
+
+	if (ck_grid) draw_grid(svg, w, h);
 
 	if (ck_conlines) {
 		var len = conline.length;
@@ -624,6 +675,7 @@ function set_user_obs() {
 	document.getElementById("show_date").checked = ck_date;
 	document.getElementById("show_time").checked = ck_time;
 	document.getElementById("show_border").checked = ck_border;
+	document.getElementById("show_grid").checked = ck_grid;
 
 	document.getElementById("user_message").value = message;
 	document.getElementById("user_music").value = song_link;
@@ -683,6 +735,7 @@ function get_user_obs() {
 	ck_date = document.getElementById("show_date").checked;
 	ck_time = document.getElementById("show_time").checked;
 	ck_border = document.getElementById("show_border").checked;
+	ck_grid = document.getElementById("show_grid").checked;
 
 	// cores, escalas e tamanhos
 	sky_color = document.getElementById("sky_color").value;
