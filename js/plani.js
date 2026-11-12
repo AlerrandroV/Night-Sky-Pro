@@ -59,7 +59,12 @@ var ck_time = true;
 var ck_coordinates = true;
 var text_color = "#ffffff";
 var text_scale = 1;
+
+// Código do Spotify (o "código de barras" que o app do Spotify escaneia)
+var ck_spotify = true;
 var song_link = "https://open.spotify.com/intl-pt/track/0tgVpDi06FyKpA1z0VMD4v";
+var spotify_color = "#ffffff";
+var spotify_scale = 1;
 
 // Lua (desenhada na fase do momento escolhido)
 var ck_moon = true;
@@ -592,7 +597,8 @@ function build_poster() {
 	var msgSize = 0.045 * unit * text_scale;
 	var detSize = 0.024 * unit * text_scale;
 	var gap = 0.06 * unit;
-	var hasText = texts.message || texts.details.length;
+	var code = ck_spotify ? spotify_code_for_poster() : null;
+	var hasText = texts.message || texts.details.length || code;
 
 	// Formatos horizontais: céu à esquerda e texto à direita.
 	// Demais formatos: céu em cima e texto embaixo.
@@ -602,6 +608,15 @@ function build_poster() {
 	var textH = 0;
 	if (msgLines.length) textH += msgLines.length * msgSize * 1.25;
 	if (texts.details.length) textH += (msgLines.length ? detSize : 0) + texts.details.length * detSize * 1.6;
+
+	// Código do Spotify abaixo dos textos, na proporção original da imagem
+	var codeW = 0, codeH = 0, codeGap = 0;
+	if (code) {
+		codeW = Math.min(0.32 * unit * spotify_scale, textW);
+		codeH = codeW * code.h / code.w;
+		codeGap = textH ? detSize * 2 : 0;
+		textH += codeGap + codeH;
+	}
 
 	var diameter, skyX, skyY, textX, textY;
 	if (landscape) {
@@ -671,7 +686,151 @@ function build_poster() {
 		d.textContent = texts.details[j];
 		svg.appendChild(d);
 	}
+
+	if (code) {
+		y += codeGap + (texts.details.length ? detSize * 0.4 : 0);
+		var codeSvg = svg_el("svg", {
+			x: textX - codeW / 2, y: y, width: codeW, height: codeH,
+			viewBox: code.viewBox
+		});
+		code.nodes.forEach(function (node) {
+			var n = node.cloneNode(true);
+			recolor_spotify_node(n);
+			codeSvg.appendChild(n);
+		});
+		svg.appendChild(codeSvg);
+	}
 	return svg;
+}
+
+// ===== Código do Spotify =====
+// O código não dá para gerar localmente: ele codifica uma referência que só
+// o Spotify resolve. A imagem vem do serviço do próprio Spotify
+// (scannables.scdn.co) em SVG, sempre com fundo preto e barras brancas, e é
+// recolorida aqui: barras na cor escolhida e fundo na cor do fundo do quadro.
+// O SVG é embutido no pôster, então entra também no PNG e no SVG exportados.
+
+var SPOTIFY_CODE_URL = "https://scannables.scdn.co/uri/plain/svg/000000/white/640/";
+var spotify_cache = {}; // uri -> { state: "loading" | "ok" | "error", code }
+
+// Converte o link colado (open.spotify.com/..., spotify:track:...) em URI
+function spotify_uri(link) {
+	link = (link || "").trim();
+	var m = link.match(/spotify:(track|album|playlist|artist|episode|show):([A-Za-z0-9]{22})/) ||
+		link.match(/open\.spotify\.com\/(?:intl-[a-zA-Z-]+\/)?(?:embed\/)?(track|album|playlist|artist|episode|show)\/([A-Za-z0-9]{22})/);
+	return m ? "spotify:" + m[1] + ":" + m[2] : null;
+}
+
+function load_spotify_code(uri) {
+	if (spotify_cache[uri]) return;
+	spotify_cache[uri] = { state: "loading" };
+	update_spotify_status();
+	fetch(SPOTIFY_CODE_URL + uri)
+		.then(function (r) {
+			if (!r.ok) throw new Error("HTTP " + r.status);
+			return r.text();
+		})
+		.then(function (text) {
+			var doc = new DOMParser().parseFromString(text, "image/svg+xml");
+			var root = doc.documentElement;
+			if (!root || root.nodeName !== "svg") throw new Error("resposta não é SVG");
+			var vb = (root.getAttribute("viewBox") || "").split(/[\s,]+/).map(Number);
+			if (vb.length !== 4 || vb.some(isNaN)) {
+				vb = [0, 0, parseFloat(root.getAttribute("width")), parseFloat(root.getAttribute("height"))];
+			}
+			if (!(vb[2] > 0 && vb[3] > 0)) throw new Error("SVG sem tamanho");
+			spotify_cache[uri] = {
+				state: "ok",
+				code: {
+					viewBox: vb.join(" "), w: vb[2], h: vb[3],
+					nodes: Array.prototype.slice.call(root.childNodes).filter(function (n) {
+						return n.nodeType === 1;
+					})
+				}
+			};
+		})
+		.catch(function (err) {
+			console.warn("Código do Spotify:", err);
+			spotify_cache[uri] = { state: "error" };
+		})
+		.then(function () {
+			update_spotify_status();
+			refresh();
+		});
+}
+
+function spotify_code_for_poster() {
+	var uri = spotify_uri(song_link);
+	var entry = uri && spotify_cache[uri];
+	return entry && entry.state === "ok" ? entry.code : null;
+}
+
+// Cores claras (as barras e o logo) viram spotify_color; escuras (o fundo e
+// as ondas do logo) viram a cor do fundo do quadro.
+function recolor_spotify_node(node) {
+	if (node.nodeType !== 1) return;
+	["fill", "stroke"].forEach(function (attr) {
+		var c = node.getAttribute(attr);
+		if (c && c !== "none") node.setAttribute(attr, is_light_color(c) ? spotify_color : bg_color);
+	});
+	for (var i = 0; i < node.childNodes.length; i++) recolor_spotify_node(node.childNodes[i]);
+}
+
+function is_light_color(c) {
+	c = c.trim().toLowerCase();
+	if (c === "white") return true;
+	if (c === "black") return false;
+	var m = c.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/);
+	if (!m) return true;
+	var hex = m[1].length === 3 ? m[1].replace(/./g, "$&$&") : m[1];
+	var n = parseInt(hex, 16);
+	var lum = 0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255);
+	return lum > 127;
+}
+
+// Mostra no painel o que está acontecendo com o código e dispara o download
+function update_spotify_status() {
+	var el = document.getElementById("spotify_status");
+	if (!el) return;
+	var link = (song_link || "").trim();
+	var uri = spotify_uri(link);
+	var msg = "", cls = "";
+	if (!link) {
+		msg = "Cole o link de uma música, álbum, playlist ou podcast do Spotify.";
+	} else if (/spotify\.link\//.test(link)) {
+		msg = "Links curtos (spotify.link) não funcionam. No Spotify, use Compartilhar → Copiar link da música e cole o link do open.spotify.com.";
+		cls = "error";
+	} else if (!uri) {
+		msg = "Link não reconhecido. Use um link do open.spotify.com.";
+		cls = "error";
+	} else {
+		var entry = spotify_cache[uri];
+		if (!entry) {
+			load_spotify_code(uri);
+			return;
+		}
+		if (entry.state === "loading") msg = "Baixando o código do Spotify…";
+		else if (entry.state === "ok") { msg = "Código do Spotify adicionado ao quadro."; cls = "ok"; }
+		else { msg = "Não foi possível baixar o código do Spotify. Verifique a conexão e tente de novo."; cls = "error"; }
+	}
+	el.textContent = msg;
+	el.className = "status " + cls;
+	if (cls === "error" && uri) {
+		var retry = document.createElement("button");
+		retry.type = "button";
+		retry.className = "link-button";
+		retry.textContent = "Tentar de novo";
+		retry.onclick = retry_spotify_code;
+		el.appendChild(document.createTextNode(" "));
+		el.appendChild(retry);
+	}
+}
+
+// Tenta baixar de novo um código que falhou
+function retry_spotify_code() {
+	var uri = spotify_uri(song_link);
+	if (uri && spotify_cache[uri] && spotify_cache[uri].state === "error") delete spotify_cache[uri];
+	update_spotify_status();
 }
 
 // draw_sky desenha direto no svg do céu (as funções de desenho leem o viewBox
@@ -835,7 +994,11 @@ var SETTINGS = [
 	["show_coordinates", "ck_coordinates", "bool"],
 	["text_color", "text_color", "color"],
 	["text_scale", "text_scale", "float"],
-	["user_music", "song_link", "text"]
+
+	["show_spotify", "ck_spotify", "bool"],
+	["user_music", "song_link", "text"],
+	["spotify_color", "spotify_color", "color"],
+	["spotify_scale", "spotify_scale", "float"]
 ];
 
 // Grava os valores das variáveis globais no formulário
@@ -924,6 +1087,7 @@ function get_user_obs() {
 
 	read_settings();
 	set_user_obs();
+	if (ck_spotify) update_spotify_status(); // baixa o código se o link for novo
 	refresh();
 }
 
