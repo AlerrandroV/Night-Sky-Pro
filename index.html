@@ -4,17 +4,18 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1">
 	<title>NightSky Enhanced</title>
-	<link rel="stylesheet" href="css/plani.css?v=20261112c">
-	<script src="js/astro.js?v=20261112c"></script>
-	<script src="js/observer.js?v=20261112c"></script>
-	<script src="js/skypos.js?v=20261112c"></script>
-	<script src="js/skydb.js?v=20261112c"></script>
-	<script src="js/lib/opentype.min.js?v=20261112c"></script>
-	<script src="js/lib/jszip.min.js?v=20261112c"></script>
-	<script src="js/fonts.js?v=20261112c"></script>
-	<script src="js/location.js?v=20261112c"></script>
-	<script src="js/plani.js?v=20261112c"></script>
-	<script src="js/jscolor.js?v=20261112c"></script>
+	<link rel="stylesheet" href="css/plani.css?v=20261113a">
+	<script src="js/astro.js?v=20261113a"></script>
+	<script src="js/observer.js?v=20261113a"></script>
+	<script src="js/skypos.js?v=20261113a"></script>
+	<script src="js/skydb.js?v=20261113a"></script>
+	<script src="js/lib/opentype.min.js?v=20261113a"></script>
+	<script src="js/lib/jszip.min.js?v=20261113a"></script>
+	<script src="js/i18n.js?v=20261113a"></script>
+	<script src="js/fonts.js?v=20261113a"></script>
+	<script src="js/location.js?v=20261113a"></script>
+	<script src="js/plani.js?v=20261113a"></script>
+	<script src="js/jscolor.js?v=20261113a"></script>
 	<script>
 		window.addEventListener("load", canvasApp, false);
 
@@ -28,50 +29,54 @@
 
 	<div id="main">
 		<!-- Canvas -->
-		<div id="planicanvas" onclick="openPosterZoom()" title="Toque para ampliar"></div>
+		<div id="planicanvas" onclick="openPosterZoom()" title="Toque para ampliar" data-i18n-title="zoom_touch"></div>
 
 		<!-- Painel de configurações: seções expansíveis. Itens com data-show-if
 		     só aparecem quando os interruptores indicados estão ligados. -->
 		<div id="controls">
 
+			<div class="lang-row">
+				<svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+				<label for="ui_lang" data-i18n="language">Idioma</label>
+				<select id="ui_lang" onchange="set_ui_language(this.value)"></select>
+			</div>
+
 			<details class="group" open>
-				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>Momento</span></summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><span data-i18n="sec_moment">Momento</span></span></summary>
 				<div id="datetime">
-					<input type="text" id="user_date" value="2023-12-21" placeholder="Data"
+					<input type="text" id="user_date" value="2023-12-21" placeholder="Data" data-i18n-ph="date"
 					onfocus="(this.type='date')" onblur="(this.type='text')">
-					<input type="text" id="user_time" value="22:31" placeholder="Hora"
+					<input type="text" id="user_time" value="22:31" placeholder="Hora" data-i18n-ph="time"
 					onfocus="(this.type='time')" onblur="(this.type='text')">
-					<input id="time" type="button" value="Agora" onclick="currentTime()">
+					<input id="time" type="button" value="Agora" data-i18n-value="now" onclick="currentTime()">
 				</div>
 			</details>
 
 			<details class="group" open>
-				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>Local</span></summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg><span data-i18n="sec_location">Local</span></span></summary>
 				<div class="search-box">
-					<input type="search" id="place_search" placeholder="Buscar cidade, rua ou endereço" autocomplete="off"
+					<input type="search" id="place_search" placeholder="Buscar cidade, rua ou endereço" data-i18n-ph="search_ph" autocomplete="off"
 					oninput="on_place_search_input()" onkeydown="on_place_search_key(event)" onblur="on_place_search_blur()">
 					<ul id="place_suggestions" role="listbox" hidden></ul>
 				</div>
 				<div class="button-row">
-					<input id="mappick" type="button" value="Selecionar no mapa" onclick="open_map_picker()">
-					<input id="geoloc" type="button" value="Minha localização" onclick="getGeoPos()">
+					<input id="mappick" type="button" value="Selecionar no mapa" data-i18n-value="pick_map" onclick="open_map_picker()">
+					<input id="geoloc" type="button" value="Minha localização" data-i18n-value="my_location" onclick="getGeoPos()">
 				</div>
 				<div class="set-item">
-					Nome do local
-					<input id="place_name" type="text" placeholder="Ex.: Belém, Pará, Brasil">
+					<span data-i18n="place_name">Nome do local</span>
+					<input id="place_name" type="text" placeholder="Ex.: Belém, Pará, Brasil" data-i18n-ph="place_ph">
 				</div>
 				<div id="location-inputs">
-					<input type="number" id="user_lat" value="-1.3529019" placeholder="Latitude" step="any"
-					onfocus="(this.placeholder='Ex.: -23.5505')" onblur="(this.placeholder='Latitude')">
-					<input type="number" id="user_lon" value="-48.3882851" placeholder="Longitude" step="any"
-					onfocus="(this.placeholder='Ex.: -46.6333')" onblur="(this.placeholder='Longitude')">
+					<input type="number" id="user_lat" value="-1.3529019" placeholder="Latitude" step="any" data-i18n-ph="lat_ph">
+					<input type="number" id="user_lon" value="-48.3882851" placeholder="Longitude" step="any" data-i18n-ph="lon_ph">
 				</div>
 			</details>
 
 			<details class="group">
-				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2.5" width="16" height="19" rx="1.5"/><path d="M7 17.5l3.5-4 2.5 2.5 2-2 2 3.5"/><circle cx="9.5" cy="8.5" r="1.5"/></svg>Quadro</span></summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2.5" width="16" height="19" rx="1.5"/><path d="M7 17.5l3.5-4 2.5 2.5 2-2 2 3.5"/><circle cx="9.5" cy="8.5" r="1.5"/></svg><span data-i18n="sec_frame">Quadro</span></span></summary>
 				<div class="set-item">
-					<label for="frame_format">Formato</label>
+					<label for="frame_format" data-i18n="format">Formato</label>
 					<select id="frame_format">
 						<option value="A4">A4 (21 × 29,7 cm)</option>
 						<option value="A3">A3 (29,7 × 42 cm)</option>
@@ -81,286 +86,286 @@
 						<option value="40x50">40 × 50 cm</option>
 						<option value="50x70">50 × 70 cm</option>
 						<option value="60x90">60 × 90 cm</option>
-						<option value="custom">Personalizado</option>
+						<option value="custom" data-i18n="custom">Personalizado</option>
 					</select>
 				</div>
 				<div id="custom_size" class="set-item" style="display:none;">
-					<input type="number" id="custom_width" placeholder="Largura (cm)" min="5" step="0.1">
-					<input type="number" id="custom_height" placeholder="Altura (cm)" min="5" step="0.1">
+					<input type="number" id="custom_width" placeholder="Largura (cm)" data-i18n-ph="width_ph" min="5" step="0.1">
+					<input type="number" id="custom_height" placeholder="Altura (cm)" data-i18n-ph="height_ph" min="5" step="0.1">
 				</div>
 				<div class="set-item">
-					Cor do fundo
+					<span data-i18n="bg_color">Cor do fundo</span>
 					<input id="bg_color" data-jscolor="{}">
 				</div>
 				<div class="set-item">
-					Resolução do PNG (px, lado maior)
+					<span data-i18n="resolution">Resolução do PNG (px, lado maior)</span>
 					<input id="resolution" type="number" min="256" step="100">
 				</div>
 			</details>
 
 			<details class="group">
-				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="1.5"/><circle cx="12" cy="12" r="5.5"/></svg>Moldura e contorno do céu</span></summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="1.5"/><circle cx="12" cy="12" r="5.5"/></svg><span data-i18n="sec_border">Moldura e contorno do céu</span></span></summary>
 				<div class="set-item">
-					Mostrar
+					<span data-i18n="show">Mostrar</span>
 					<label class="switch"><input id="show_border" type="checkbox"><span class="slider"></span></label>
 				</div>
 				<div class="set-item" data-show-if="show_border">
-					Cor
+					<span data-i18n="color">Cor</span>
 					<input id="border_color" data-jscolor="{}">
 				</div>
 				<div class="set-item" data-show-if="show_border">
-					Espessura
+					<span data-i18n="thickness">Espessura</span>
 					<input id="border_scale" type="number" min="0.1" step="0.1">
 				</div>
 				<div class="set-item" data-show-if="show_border">
-					Opacidade (%)
+					<span data-i18n="opacity">Opacidade (%)</span>
 					<input id="border_opacity" type="number" min="0" max="100" step="5">
 				</div>
 			</details>
 
 			<details class="group">
-				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg>Céu e estrelas</span></summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg><span data-i18n="sec_sky">Céu e estrelas</span></span></summary>
 				<div class="set-item">
-					Cor do céu
+					<span data-i18n="sky_color">Cor do céu</span>
 					<input id="sky_color" data-jscolor="{}">
 				</div>
 				<div class="set-item">
-					Cor das estrelas
+					<span data-i18n="star_color">Cor das estrelas</span>
 					<input id="star_color" data-jscolor="{}">
 				</div>
 				<div class="set-item">
-					Tamanho das estrelas
+					<span data-i18n="star_size">Tamanho das estrelas</span>
 					<input id="star_scale" type="number" min="0.1" step="0.1">
 				</div>
 				<hr>
 				<div class="set-item">
-					Nomes das estrelas
+					<span data-i18n="star_names">Nomes das estrelas</span>
 					<label class="switch"><input id="user_starlab" type="checkbox"><span class="slider"></span></label>
 				</div>
 				<div class="set-item" data-show-if="user_starlab">
-					Cor dos nomes
+					<span data-i18n="names_color">Cor dos nomes</span>
 					<input id="starLabel_color" data-jscolor="{}">
 				</div>
 				<div class="set-item" data-show-if="user_starlab">
-					Tamanho dos nomes
+					<span data-i18n="names_size">Tamanho dos nomes</span>
 					<input id="starLabel_size" type="number" min="1" step="1">
 				</div>
 			</details>
 
 			<details class="group">
-				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><path d="M7.4 14.6C4.3 16.6 2.6 18.5 3.2 19.4c.9 1.4 6.4-.6 11.6-4.3s8.6-8.2 7.7-9.6c-.5-.9-2.6-.6-5.5.8"/></svg>Planetas</span></summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><path d="M7.4 14.6C4.3 16.6 2.6 18.5 3.2 19.4c.9 1.4 6.4-.6 11.6-4.3s8.6-8.2 7.7-9.6c-.5-.9-2.6-.6-5.5.8"/></svg><span data-i18n="sec_planets">Planetas</span></span></summary>
 				<div class="set-item">
-					Mostrar
+					<span data-i18n="show">Mostrar</span>
 					<label class="switch"><input id="show_planets" type="checkbox"><span class="slider"></span></label>
 				</div>
 				<div class="set-item" data-show-if="show_planets">
-					Tamanho dos planetas
+					<span data-i18n="planet_size">Tamanho dos planetas</span>
 					<input id="planet_scale" type="number" min="0.1" step="0.1">
 				</div>
 				<div class="set-item" data-show-if="show_planets">
-					Nomes dos planetas
+					<span data-i18n="planet_names">Nomes dos planetas</span>
 					<label class="switch"><input id="show_planetlab" type="checkbox"><span class="slider"></span></label>
 				</div>
 				<div class="set-item" data-show-if="show_planets show_planetlab">
-					Cor dos nomes
+					<span data-i18n="names_color">Cor dos nomes</span>
 					<input id="planetLabel_color" data-jscolor="{}">
 				</div>
 				<div class="set-item" data-show-if="show_planets show_planetlab">
-					Tamanho dos nomes
+					<span data-i18n="names_size">Tamanho dos nomes</span>
 					<input id="planetLabel_size" type="number" min="1" step="1">
 				</div>
 			</details>
 
 			<details class="group">
-				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg>Lua</span></summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg><span data-i18n="sec_moon">Lua</span></span></summary>
 				<div class="set-item">
-					Mostrar (na fase do momento)
+					<span data-i18n="moon_show">Mostrar (na fase do momento)</span>
 					<label class="switch"><input id="show_moon" type="checkbox"><span class="slider"></span></label>
 				</div>
 				<div class="set-item" data-show-if="show_moon">
-					Cor
+					<span data-i18n="color">Cor</span>
 					<input id="moon_color" data-jscolor="{}">
 				</div>
 				<div class="set-item" data-show-if="show_moon">
-					Tamanho
+					<span data-i18n="size">Tamanho</span>
 					<input id="moon_scale" type="number" min="0.1" step="0.1">
 				</div>
 				<div class="set-item" data-show-if="show_moon">
-					Nome
+					<span data-i18n="name">Nome</span>
 					<label class="switch"><input id="show_moonlab" type="checkbox"><span class="slider"></span></label>
 				</div>
 				<div class="set-item" data-show-if="show_moon show_moonlab">
-					Cor do nome
+					<span data-i18n="name_color">Cor do nome</span>
 					<input id="moonLabel_color" data-jscolor="{}">
 				</div>
 				<div class="set-item" data-show-if="show_moon show_moonlab">
-					Tamanho do nome
+					<span data-i18n="name_size">Tamanho do nome</span>
 					<input id="moonLabel_size" type="number" min="1" step="1">
 				</div>
 			</details>
 
 			<details class="group">
-				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 18l4.5-6 5 3L20 6"/><circle cx="4" cy="18" r="1.7" fill="currentColor"/><circle cx="8.5" cy="12" r="1.7" fill="currentColor"/><circle cx="13.5" cy="15" r="1.7" fill="currentColor"/><circle cx="20" cy="6" r="1.7" fill="currentColor"/></svg>Constelações</span></summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 18l4.5-6 5 3L20 6"/><circle cx="4" cy="18" r="1.7" fill="currentColor"/><circle cx="8.5" cy="12" r="1.7" fill="currentColor"/><circle cx="13.5" cy="15" r="1.7" fill="currentColor"/><circle cx="20" cy="6" r="1.7" fill="currentColor"/></svg><span data-i18n="sec_const">Constelações</span></span></summary>
 				<div class="set-item">
-					Linhas
+					<span data-i18n="lines">Linhas</span>
 					<label class="switch"><input id="user_conline" type="checkbox"><span class="slider"></span></label>
 				</div>
 				<div class="set-item" data-show-if="user_conline">
-					Cor das linhas
+					<span data-i18n="lines_color">Cor das linhas</span>
 					<input id="conLine_color" data-jscolor="{}">
 				</div>
 				<div class="set-item" data-show-if="user_conline">
-					Espessura das linhas
+					<span data-i18n="lines_thickness">Espessura das linhas</span>
 					<input id="conLine_scale" type="number" min="0.1" step="0.1">
 				</div>
 				<hr>
 				<div class="set-item">
-					Nomes
+					<span data-i18n="names">Nomes</span>
 					<label class="switch"><input id="user_conlab" type="checkbox"><span class="slider"></span></label>
 				</div>
 				<div class="set-item" data-show-if="user_conlab">
-					Cor dos nomes
+					<span data-i18n="names_color">Cor dos nomes</span>
 					<input id="conLabel_color" data-jscolor="{}">
 				</div>
 				<div class="set-item" data-show-if="user_conlab">
-					Tamanho dos nomes
+					<span data-i18n="names_size">Tamanho dos nomes</span>
 					<input id="conLabel_size" type="number" min="1" step="1">
 				</div>
 			</details>
 
 			<details class="group">
-				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="12" rx="10" ry="4.3" transform="rotate(-28 12 12)"/><ellipse cx="12" cy="12" rx="4.6" ry="2.3" transform="rotate(-28 12 12)"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg>Objetos de céu profundo</span></summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="12" rx="10" ry="4.3" transform="rotate(-28 12 12)"/><ellipse cx="12" cy="12" rx="4.6" ry="2.3" transform="rotate(-28 12 12)"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg><span data-i18n="sec_dso">Objetos de céu profundo</span></span></summary>
 				<div class="set-item">
-					Mostrar (galáxias, nebulosas, aglomerados)
+					<span data-i18n="dso_show">Mostrar (galáxias, nebulosas, aglomerados)</span>
 					<label class="switch"><input id="user_dsos" type="checkbox"><span class="slider"></span></label>
 				</div>
 				<div class="set-item" data-show-if="user_dsos">
-					Cor
+					<span data-i18n="color">Cor</span>
 					<input id="dsoLabel_color" data-jscolor="{}">
 				</div>
 				<div class="set-item" data-show-if="user_dsos">
-					Tamanho dos nomes
+					<span data-i18n="names_size">Tamanho dos nomes</span>
 					<input id="dsoLabel_size" type="number" min="1" step="1">
 				</div>
 			</details>
 
 			<details class="group">
-				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18M4.6 7.5h14.8M4.6 16.5h14.8"/></svg>Grade de coordenadas</span></summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18M4.6 7.5h14.8M4.6 16.5h14.8"/></svg><span data-i18n="sec_grid">Grade de coordenadas</span></span></summary>
 				<div class="set-item">
-					Mostrar
+					<span data-i18n="show">Mostrar</span>
 					<label class="switch"><input id="show_grid" type="checkbox"><span class="slider"></span></label>
 				</div>
 				<div class="set-item" data-show-if="show_grid">
-					Cor das linhas
+					<span data-i18n="lines_color">Cor das linhas</span>
 					<input id="grid_color" data-jscolor="{}">
 				</div>
 				<div class="set-item" data-show-if="show_grid">
-					Espessura das linhas
+					<span data-i18n="lines_thickness">Espessura das linhas</span>
 					<input id="grid_scale" type="number" min="0.1" step="0.1">
 				</div>
 				<div class="set-item" data-show-if="show_grid">
-					Opacidade das linhas (%)
+					<span data-i18n="lines_opacity">Opacidade das linhas (%)</span>
 					<input id="grid_opacity" type="number" min="0" max="100" step="5">
 				</div>
 				<div class="set-item" data-show-if="show_grid">
-					Rótulos (horas e declinações)
+					<span data-i18n="grid_labels">Rótulos (horas e declinações)</span>
 					<label class="switch"><input id="show_gridlab" type="checkbox"><span class="slider"></span></label>
 				</div>
 				<div class="set-item" data-show-if="show_grid show_gridlab">
-					Cor dos rótulos
+					<span data-i18n="labels_color">Cor dos rótulos</span>
 					<input id="gridLabel_color" data-jscolor="{}">
 				</div>
 				<div class="set-item" data-show-if="show_grid show_gridlab">
-					Tamanho dos rótulos
+					<span data-i18n="labels_size">Tamanho dos rótulos</span>
 					<input id="gridLabel_size" type="number" min="1" step="1">
 				</div>
 				<div class="set-item" data-show-if="show_grid show_gridlab">
-					Opacidade dos rótulos (%)
+					<span data-i18n="labels_opacity">Opacidade dos rótulos (%)</span>
 					<input id="gridLabel_opacity" type="number" min="0" max="100" step="5">
 				</div>
 			</details>
 
 			<details class="group">
-				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7V4.5h14V7M12 4.5v15M9 19.5h6"/></svg>Textos</span></summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7V4.5h14V7M12 4.5v15M9 19.5h6"/></svg><span data-i18n="sec_texts">Textos</span></span></summary>
 				<div class="set-item">
-					Mensagem
-					<input id="user_message" type="text" placeholder="Deixe vazio para não mostrar">
+					<span data-i18n="message">Mensagem</span>
+					<input id="user_message" type="text" placeholder="Deixe vazio para não mostrar" data-i18n-ph="message_ph">
 				</div>
 				<div class="set-item">
-					Nome do local
+					<span data-i18n="place_name">Nome do local</span>
 					<label class="switch"><input id="show_place" type="checkbox"><span class="slider"></span></label>
 				</div>
 				<div class="set-item">
-					Data
+					<span data-i18n="date">Data</span>
 					<label class="switch"><input id="show_date" type="checkbox"><span class="slider"></span></label>
 				</div>
 				<div class="set-item">
-					Hora
+					<span data-i18n="time">Hora</span>
 					<label class="switch"><input id="show_time" type="checkbox"><span class="slider"></span></label>
 				</div>
 				<div class="set-item">
-					Coordenadas
+					<span data-i18n="coords">Coordenadas</span>
 					<label class="switch"><input id="show_coordinates" type="checkbox"><span class="slider"></span></label>
 				</div>
 				<div class="set-item">
-					Cor dos textos
+					<span data-i18n="text_color">Cor dos textos</span>
 					<input id="text_color" data-jscolor="{}">
 				</div>
 				<div class="set-item">
-					Tamanho dos textos
+					<span data-i18n="text_size">Tamanho dos textos</span>
 					<input id="text_scale" type="number" min="0.1" step="0.1">
+				</div>
+				<div class="set-item">
+					<span data-i18n="art_lang">Idioma da arte</span>
+					<select id="art_lang"></select>
 				</div>
 			</details>
 
 			<details class="group">
-				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 19L7.5 5l5 14M4.3 14h6.4"/><circle cx="17.5" cy="15.5" r="3.5"/><path d="M21 12v7"/></svg>Fontes</span></summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 19L7.5 5l5 14M4.3 14h6.4"/><circle cx="17.5" cy="15.5" r="3.5"/><path d="M21 12v7"/></svg><span data-i18n="sec_fonts">Fontes</span></span></summary>
 				<div class="set-item">
-					Mensagem
+					<span data-i18n="message">Mensagem</span>
 					<select id="msg_font"></select>
 				</div>
 				<div class="set-item">
-					Data, hora e coordenadas
+					<span data-i18n="fonts_details">Data, hora e coordenadas</span>
 					<select id="det_font"></select>
 				</div>
 				<hr>
 				<div class="set-item">
-					Fonte personalizada
+					<span data-i18n="custom_font">Fonte personalizada</span>
 					<label class="file-button">
-						Importar arquivo
+						<span data-i18n="import_file">Importar arquivo</span>
 						<input id="font_file" type="file" accept=".ttf,.otf,.woff,.zip" onchange="load_font_file(this)">
 					</label>
 				</div>
-				<p class="hint">
-					Não gostou de nenhuma fonte? Quem sabe você não encontra a fonte ideal no
-					<a href="https://www.dafont.com" target="_blank" rel="noopener">dafont</a>?
-					Copie o link da fonte desejada e cole logo abaixo.
-				</p>
+				<p class="hint" data-i18n-html="dafont_hint"></p>
 				<div class="paste-row">
 					<input id="dafont_link" type="url" placeholder="https://www.dafont.com/nome-da-fonte.font" onchange="load_dafont_link()">
-					<button id="dafont_paste" type="button" onclick="paste_dafont_link()">Colar</button>
+					<button id="dafont_paste" type="button" onclick="paste_dafont_link()" data-i18n="paste">Colar</button>
 				</div>
 				<p id="font_status" class="status"></p>
 			</details>
 
 			<details class="group">
-				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5v3M7.5 7v10M11 9v6M14.5 5v14M18 8.5v7M21 11v2"/></svg>Código do Spotify</span></summary>
+				<summary><span class="sum-title"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5v3M7.5 7v10M11 9v6M14.5 5v14M18 8.5v7M21 11v2"/></svg><span data-i18n="sec_spotify">Código do Spotify</span></span></summary>
 				<div class="set-item">
-					Mostrar
+					<span data-i18n="show">Mostrar</span>
 					<label class="switch"><input id="show_spotify" type="checkbox"><span class="slider"></span></label>
 				</div>
 				<div class="set-item" data-show-if="show_spotify">
-					Link
+					<span data-i18n="link">Link</span>
 					<input id="user_music" type="text" placeholder="https://open.spotify.com/track/...">
 				</div>
 				<div class="set-item" data-show-if="show_spotify">
 					<p id="spotify_status" class="status"></p>
 				</div>
 				<div class="set-item" data-show-if="show_spotify">
-					Cor
+					<span data-i18n="color">Cor</span>
 					<input id="spotify_color" data-jscolor="{}">
 				</div>
 				<div class="set-item" data-show-if="show_spotify">
-					Tamanho
+					<span data-i18n="size">Tamanho</span>
 					<input id="spotify_scale" type="number" min="0.1" step="0.1">
 				</div>
 			</details>
@@ -370,10 +375,10 @@
 		<!-- Action Buttons fixos -->
 		<section id="actions">
 			<div id="btn-save-image" onclick="saveImage()">
-				SALVAR IMAGEM
+				<span data-i18n="save_image">SALVAR IMAGEM</span>
 			</div>
 			<div id="btn-save-vector" onclick="saveAsVector()">
-				SALVAR VETOR
+				<span data-i18n="save_vector">SALVAR VETOR</span>
 			</div>
 		</section>
 
@@ -382,18 +387,18 @@
 	<!-- Janela para escolher o local no mapa -->
 	<div id="map-modal" class="overlay" role="dialog" aria-modal="true" aria-labelledby="map-title">
 		<div class="map-card">
-			<p id="map-title">Toque no mapa ou arraste o marcador até o local</p>
+			<p id="map-title" data-i18n="map_title">Toque no mapa ou arraste o marcador até o local</p>
 			<div id="map"></div>
 			<div class="map-actions">
-				<input type="button" class="secondary" value="Cancelar" onclick="close_map_picker()">
-				<input type="button" value="Confirmar" onclick="confirm_map_picker()">
+				<input type="button" class="secondary" value="Cancelar" data-i18n-value="cancel" onclick="close_map_picker()">
+				<input type="button" value="Confirmar" data-i18n-value="confirm" onclick="confirm_map_picker()">
 			</div>
 		</div>
 	</div>
 
 	<!-- Visualização do quadro em tela cheia -->
 	<div id="poster-zoom" class="overlay" onclick="closePosterZoom(event)">
-		<button id="poster-zoom-close" type="button" aria-label="Fechar">✕</button>
+		<button id="poster-zoom-close" type="button" aria-label="Fechar" data-i18n-aria="close">✕</button>
 	</div>
 </body>
 </html>

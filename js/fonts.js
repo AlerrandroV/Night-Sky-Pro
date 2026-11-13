@@ -6,7 +6,7 @@
 
 // Fontes pré-programadas (arquivos em fonts/, todas com licença SIL OFL)
 var FONT_PRESETS = [
-	{ id: "inter", name: "Inter (padrão)", file: "fonts/inter-latin-300-normal.woff" },
+	{ id: "inter", name: "Inter", file: "fonts/inter-latin-300-normal.woff", isDefault: true },
 	{ id: "montserrat", name: "Montserrat", file: "fonts/montserrat-latin-300-normal.woff" },
 	{ id: "josefin-sans", name: "Josefin Sans", file: "fonts/josefin-sans-latin-300-normal.woff" },
 	{ id: "playfair-display", name: "Playfair Display", file: "fonts/playfair-display-latin-400-normal.woff" },
@@ -49,8 +49,7 @@ function load_font(id) {
 		.catch(function (err) {
 			console.warn("Fonte " + id + ":", err);
 			entry.state = "error";
-			set_font_status("Não foi possível carregar a fonte " + preset.name + "; o texto usa a fonte do sistema. " +
-				(location.protocol === "file:" ? "Abrindo o index.html direto do computador, o navegador bloqueia as fontes: use um servidor local (veja o README)." : "Verifique a conexão."), "error");
+			set_font_status([["font_load_fail", { name: preset.name }], [location.protocol === "file:" ? "font_file_proto" : "check_connection"]], "error");
 			return null;
 		});
 	font_cache[id] = entry;
@@ -141,7 +140,7 @@ function parse_font_buffer(buf, filename) {
 	var isZip = bytes[0] === 0x50 && bytes[1] === 0x4b; // "PK"
 	if (!isZip) {
 		if (/\.woff2$/i.test(filename || "") || (bytes[0] === 0x77 && bytes[1] === 0x4f && bytes[2] === 0x46 && bytes[3] === 0x32)) {
-			return Promise.reject(new Error("O formato WOFF2 não é suportado. Use um arquivo TTF, OTF ou WOFF."));
+			return Promise.reject(new Error("woff2"));
 		}
 		return Promise.resolve({ font: opentype.parse(buf), file: filename });
 	}
@@ -149,7 +148,7 @@ function parse_font_buffer(buf, filename) {
 		var files = Object.keys(zip.files).filter(function (name) {
 			return FONT_FILE_RE.test(name) && !/__MACOSX|\/\._/.test(name) && !zip.files[name].dir;
 		});
-		if (!files.length) throw new Error("O arquivo .zip não tem nenhuma fonte TTF, OTF ou WOFF.");
+		if (!files.length) throw new Error("zip_nofont");
 		var best = pick_regular_font(files);
 		return zip.files[best].async("arraybuffer").then(function (fb) {
 			return { font: opentype.parse(fb), file: best.split("/").pop() };
@@ -176,28 +175,28 @@ function set_custom_font(font, source) {
 	update_font_selects();
 	// A fonte recém-adicionada passa a ser a da mensagem
 	document.getElementById("msg_font").value = CUSTOM_FONT_ID;
-	set_font_status("Fonte \"" + name + "\" adicionada e aplicada à mensagem. Ela também aparece como opção para os detalhes.", "ok");
+	set_font_status([["font_added", { name: name }]], "ok");
 	get_user_obs();
 }
 
 function load_font_file(input) {
 	var file = input.files && input.files[0];
 	if (!file) return;
-	set_font_status("Lendo " + file.name + "…", "");
+	set_font_status([["font_reading", { file: file.name }]], "");
 	file.arrayBuffer()
 		.then(function (buf) { return parse_font_buffer(buf, file.name); })
 		.then(function (r) { set_custom_font(r.font, r.file); })
 		.catch(function (err) {
 			console.warn("Fonte importada:", err);
-			set_font_status(font_error_message(err), "error");
+			set_font_status([[font_error_key(err)]], "error");
 		})
 		.then(function () { input.value = ""; });
 }
 
-function font_error_message(err) {
-	var msg = err && err.message || "";
-	if (/WOFF2|zip/.test(msg)) return msg;
-	return "Não foi possível ler essa fonte. Use um arquivo TTF, OTF, WOFF ou o .zip baixado do dafont.";
+// Erros conhecidos viram a mensagem própria; o resto, uma mensagem geral
+function font_error_key(err) {
+	var key = err && err.message;
+	return key === "woff2" || key === "zip_nofont" ? key : "font_read_fail";
 }
 
 // ----- dafont -----
@@ -246,23 +245,23 @@ var dafont_loading = null;
 function load_dafont_link() {
 	var link = document.getElementById("dafont_link").value.trim();
 	if (!link) {
-		set_font_status("", "");
+		set_font_status(null);
 		return;
 	}
 	var url = dafont_download_url(link);
 	if (!url) {
-		set_font_status("Link não reconhecido. Abra a fonte no dafont e copie o endereço da página (termina em .font).", "error");
+		set_font_status([["dafont_bad"]], "error");
 		return;
 	}
 	if (dafont_loading === url) return;
 	dafont_loading = url;
-	set_font_status("Baixando a fonte do dafont…", "");
+	set_font_status([["dafont_loading"]], "");
 	fetch_first(DAFONT_FETCHERS.map(function (f) { return f(url); }))
 		.then(function (buf) { return parse_font_buffer(buf, "dafont.zip"); })
 		.then(function (r) { set_custom_font(r.font, r.file); })
 		.catch(function (err) {
 			console.warn("dafont:", err);
-			set_font_status("Não foi possível baixar essa fonte automaticamente. Clique em \"Download\" na página do dafont e importe o arquivo .zip pelo botão \"Importar arquivo\" acima.", "error");
+			set_font_status([["dafont_fail"]], "error");
 		})
 		.then(function () { dafont_loading = null; });
 }
@@ -270,7 +269,7 @@ function load_dafont_link() {
 function paste_dafont_link() {
 	var input = document.getElementById("dafont_link");
 	if (!navigator.clipboard || !navigator.clipboard.readText) {
-		set_font_status("Seu navegador não deixa o site ler a área de transferência. Cole o link no campo manualmente.", "error");
+		set_font_status([["clipboard_unsupported"]], "error");
 		input.focus();
 		return;
 	}
@@ -280,18 +279,27 @@ function paste_dafont_link() {
 			load_dafont_link();
 		})
 		.catch(function () {
-			set_font_status("Não foi possível colar automaticamente. Cole o link no campo manualmente.", "error");
+			set_font_status([["clipboard_fail"]], "error");
 			input.focus();
 		});
 }
 
 // ----- Painel -----
 
-function set_font_status(msg, cls) {
+// Mensagem de estado das fontes: lista de [chave, params] traduzidas e
+// unidas. Fica guardada para ser traduzida de novo se o idioma mudar.
+var font_status = null;
+
+function set_font_status(parts, cls) {
+	font_status = parts ? { parts: parts, cls: cls || "" } : null;
+	render_font_status();
+}
+
+function render_font_status() {
 	var el = document.getElementById("font_status");
 	if (!el) return;
-	el.textContent = msg;
-	el.className = "status " + (cls || "");
+	el.textContent = font_status ? font_status.parts.map(function (p) { return t(p[0], p[1]); }).join(" ") : "";
+	el.className = "status " + (font_status ? font_status.cls : "");
 }
 
 // Preenche os seletores com as fontes pré-programadas (e a personalizada)
@@ -304,13 +312,13 @@ function update_font_selects() {
 		FONT_PRESETS.forEach(function (p) {
 			var o = document.createElement("option");
 			o.value = p.id;
-			o.textContent = p.name;
+			o.textContent = p.isDefault ? t("font_default", { name: p.name }) : p.name;
 			sel.appendChild(o);
 		});
 		if (custom_font) {
 			var o = document.createElement("option");
 			o.value = CUSTOM_FONT_ID;
-			o.textContent = "Personalizada: " + custom_font.name;
+			o.textContent = t("font_custom_opt", { name: custom_font.name });
 			sel.appendChild(o);
 		}
 		if (current) sel.value = current;

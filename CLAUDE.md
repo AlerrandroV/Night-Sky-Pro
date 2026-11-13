@@ -17,7 +17,7 @@ Quanto mais personalizável for a arte, melhor.
 - As opções ficam agrupadas em **seções expansíveis** (`<details class="group">`), uma por assunto.
 - Uma opção que não tem efeito na situação atual fica **oculta**. Exemplo: a espessura das linhas de constelação só aparece com as linhas ligadas. Use `data-show-if="id_do_interruptor"` no `.set-item`; vários ids separados por espaço exigem todos ligados.
 - Toda configuração do pôster é registrada na tabela `SETTINGS` em `js/plani.js`. Ela liga o campo do formulário à variável global. Não leia nem grave campos de configuração fora dela.
-- Textos da interface em português.
+- **Traduções:** todo texto visível (painel, mensagens, alertas e textos gerados no pôster) vem de `js/i18n.js`, com uma linha por texto nos 6 idiomas (pt, en, es, fr, de, it). No HTML, marque o elemento com `data-i18n` (texto), `data-i18n-html`, `data-i18n-ph` (placeholder), `data-i18n-value`, `data-i18n-title` ou `data-i18n-aria`; no JS, use `t("chave")` para o painel e `ta("chave")` para o pôster (idioma da arte). Nunca escreva texto de interface direto no HTML ou JS sem chave.
 - Ao mudar qualquer arquivo de `css/` ou `js/`, atualize o `?v=` de **todos** os links de CSS e JS no `index.html` (mesmo valor em todos, por exemplo a data com uma letra: `?v=20261112a`). O GitHub Pages deixa esses arquivos em cache por até 10 minutos; sem a versão nova, o navegador mistura o HTML novo com CSS ou JS antigos.
 - Ícones SVG embutidos no HTML levam `width`, `height`, `fill` e `stroke` como atributos, para não depender do CSS para ter o tamanho certo.
 

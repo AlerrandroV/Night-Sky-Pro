@@ -241,7 +241,7 @@ input:checked + .slider:before {
 }
 /* Dica de ampliar sobre a prévia */
 #planicanvas::after {
-	content: "Toque para ampliar";
+	content: attr(data-hint-touch);
 	position: absolute;
 	left: 50%;
 	transform: translateX(-50%);
@@ -343,7 +343,7 @@ input:checked + .slider:before {
 	}
 
 	#planicanvas::after {
-		content: "Clique para ampliar";
+		content: attr(data-hint-click);
 	}
 }
 
@@ -635,4 +635,23 @@ details.group hr {
 	border-radius: 50% 50% 50% 0;
 	transform: rotate(-45deg);
 	box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+/* Seletor de idioma, no topo do painel */
+.lang-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 0;
+	border-bottom: 1px solid #e4e4ea;
+	font-size: 14px;
+	color: #444;
+}
+
+.lang-row .icon {
+	color: #6200ee;
+}
+
+.lang-row select {
+	margin-left: auto;
 }

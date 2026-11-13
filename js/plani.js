@@ -53,7 +53,7 @@ var gridLabel_size = 10;
 var gridLabel_opacity = 60;   // opacidade dos rótulos, em %
 
 // Textos
-var message = "The best night of our lives";
+var message = "";             // preenchida com a mensagem padrão no idioma da arte
 var ck_date = true;
 var ck_time = true;
 var ck_coordinates = true;
@@ -120,7 +120,7 @@ function draw_planet(svg, p) {
 	text.setAttribute("y", p.pos.y);
 	text.setAttribute("fill", planetLabel_color);
 	text.setAttribute("font-size", planetLabel_size * mdd);
-	text.textContent = p.name === "Earth" ? "Sun" : p.name;
+	text.textContent = ta(p.name); // "Earth" é desenhada como o Sol
 	svg.appendChild(text);
 }
 
@@ -189,7 +189,7 @@ function draw_moon(svg, m, w, h) {
 		text.setAttribute("y", y + moonLabel_size * mdd * 0.35);
 		text.setAttribute("fill", moonLabel_color);
 		text.setAttribute("font-size", moonLabel_size * mdd);
-		text.textContent = "Lua";
+		text.textContent = ta("moon_label");
 		svg.appendChild(text);
 	}
 }
@@ -539,9 +539,11 @@ function wrap_text(text, fontSize, maxWidth, fontId) {
 	return lines;
 }
 
-function format_coord(value, pos, neg) {
+// Coordenada com o ponto cardeal no idioma da arte (ex.: 23.5505° S)
+function format_coord(value, isLat) {
 	var v = parseFloat(value);
-	return Math.abs(v).toFixed(4) + "° " + (v < 0 ? neg : pos);
+	var c = ta("compass"); // norte, sul, leste, oeste
+	return Math.abs(v).toFixed(4) + "° " + (isLat ? (v < 0 ? c[1] : c[0]) : (v < 0 ? c[3] : c[2]));
 }
 
 function poster_texts() {
@@ -556,12 +558,12 @@ function poster_texts() {
 	if (ck_date && dt) {
 		var p = dt.split("-");
 		var d = new Date(+p[0], +p[1] - 1, +p[2]);
-		when.push(d.toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" }));
+		when.push(d.toLocaleDateString(LANG_LOCALES[poster_lang()], { day: "numeric", month: "long", year: "numeric" }));
 	}
 	if (ck_time && hr) when.push(hr);
 	if (when.length) texts.details.push(when.join("  ·  "));
 	if (ck_coordinates && lat !== "" && lon !== "") {
-		texts.details.push(format_coord(lat, "N", "S") + "   " + format_coord(lon, "E", "W"));
+		texts.details.push(format_coord(lat, true) + "   " + format_coord(lon, false));
 	}
 	return texts;
 }
@@ -791,12 +793,12 @@ function update_spotify_status() {
 	var uri = spotify_uri(link);
 	var msg = "", cls = "";
 	if (!link) {
-		msg = "Cole o link de uma música, álbum, playlist ou podcast do Spotify.";
+		msg = t("spotify_empty");
 	} else if (/spotify\.link\//.test(link)) {
-		msg = "Links curtos (spotify.link) não funcionam. No Spotify, use Compartilhar → Copiar link da música e cole o link do open.spotify.com.";
+		msg = t("spotify_short");
 		cls = "error";
 	} else if (!uri) {
-		msg = "Link não reconhecido. Use um link do open.spotify.com.";
+		msg = t("spotify_bad");
 		cls = "error";
 	} else {
 		var entry = spotify_cache[uri];
@@ -804,9 +806,9 @@ function update_spotify_status() {
 			load_spotify_code(uri);
 			return;
 		}
-		if (entry.state === "loading") msg = "Baixando o código do Spotify…";
-		else if (entry.state === "ok") { msg = "Código do Spotify adicionado ao quadro."; cls = "ok"; }
-		else { msg = "Não foi possível baixar o código do Spotify. Verifique a conexão e tente de novo."; cls = "error"; }
+		if (entry.state === "loading") msg = t("spotify_loading");
+		else if (entry.state === "ok") { msg = t("spotify_ok"); cls = "ok"; }
+		else { msg = t("spotify_error"); cls = "error"; }
 	}
 	el.textContent = msg;
 	el.className = "status " + cls;
@@ -814,7 +816,7 @@ function update_spotify_status() {
 		var retry = document.createElement("button");
 		retry.type = "button";
 		retry.className = "link-button";
-		retry.textContent = "Tentar de novo";
+		retry.textContent = t("retry");
 		retry.onclick = retry_spotify_code;
 		el.appendChild(document.createTextNode(" "));
 		el.appendChild(retry);
@@ -922,12 +924,12 @@ function save_image_now() {
 		URL.revokeObjectURL(svgUrl);
 		canvas.toBlob(function (blob) {
 			if (blob) download_blob(blob, poster_filename("png"));
-			else alert("Não foi possível gerar a imagem. Tente uma resolução menor.");
+			else alert(t("img_fail_res"));
 		}, "image/png");
 	};
 	img.onerror = function () {
 		URL.revokeObjectURL(svgUrl);
-		alert("Não foi possível gerar a imagem.");
+		alert(t("img_fail"));
 	};
 	img.src = svgUrl;
 }
@@ -1001,6 +1003,7 @@ var SETTINGS = [
 	["place_name", "place_name", "text"],
 	["text_color", "text_color", "color"],
 	["text_scale", "text_scale", "float"],
+	["art_lang", "art_lang", "text"],
 	["msg_font", "msg_font", "text"],
 	["det_font", "det_font", "text"],
 
@@ -1075,12 +1078,12 @@ function get_user_obs() {
 	var dp = dt.value.split("-").map(Number);
 	var tp = hr.value.split(":").map(Number);
 	if (dp.length !== 3 || dp.some(isNaN)) {
-		alert("Data inválida: '" + dt.value + "'. Use o formato AAAA-MM-DD.");
+		alert(t("date_invalid", { value: dt.value }));
 		set_user_obs();
 		return;
 	}
 	if (tp.length < 2 || isNaN(tp[0]) || isNaN(tp[1])) {
-		alert("Hora inválida. Use o formato HH:MM.");
+		alert(t("time_invalid"));
 		set_user_obs();
 		return;
 	}
@@ -1098,9 +1101,18 @@ function get_user_obs() {
 	if (lat.value >= -90 && lat.value <= 90) now.setLatDegrees(lat.value);
 
 	read_settings();
+	// Trocou o idioma da arte e a mensagem ainda é a padrão: traduz a mensagem
+	if (is_default_message(message)) message = ta("default_message");
 	set_user_obs();
 	if (ck_spotify) update_spotify_status(); // baixa o código se o link for novo
 	refresh();
+}
+
+// Chamada por set_ui_language: refaz os textos gerados pelo código
+function on_language_change() {
+	update_font_selects();
+	render_font_status();
+	update_spotify_status();
 }
 
 function canvasApp() {
@@ -1108,7 +1120,10 @@ function canvasApp() {
 	init_dsos(dso);
 	init_planets(planet);
 	now = new Observer();
+	fill_language_selects();
+	apply_ui_language();
 	update_font_selects();
+	message = ta("default_message");
 	set_user_obs();
 	get_user_obs(); // aplica a data e o local do formulário já na abertura
 
@@ -1125,14 +1140,14 @@ function setGeoPos(geopos) {
 }
 
 function errGeoPos(error) {
-	alert("Não foi possível obter sua localização (" + error.message + "). Use a busca ou o mapa.");
+	alert(t("geo_error", { msg: error.message }));
 }
 
 function getGeoPos() {
 	if (navigator.geolocation) {
 		navigator.geolocation.getCurrentPosition(setGeoPos, errGeoPos);
 	} else {
-		alert("Este navegador não informa a localização. Use a busca ou o mapa.");
+		alert(t("geo_unsupported"));
 	}
 }
 

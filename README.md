@@ -21,6 +21,7 @@ O Night Sky Pro faz isso de graça. Ele é e sempre será **100% gratuito**, sem
 - **Código do Spotify:** cole o link de uma música, álbum, playlist ou podcast e o quadro ganha o código escaneável pelo app do Spotify, com cor e tamanho ajustáveis. O código é baixado do serviço do próprio Spotify (`scannables.scdn.co`), então precisa de internet.
 - **Fontes:** 10 fontes prontas para a mensagem e para os detalhes (data, hora e coordenadas), ou qualquer outra importada de um arquivo (TTF, OTF, WOFF ou o .zip do dafont) ou pelo link de uma fonte do [dafont](https://www.dafont.com). Os textos viram contornos, então a fonte vai embutida no PNG e no SVG.
 - **Formatos de quadro:** A4, A3, A2, 15×15, 30×40, 40×50, 50×70, 60×90 cm ou tamanho personalizado, com cor de fundo própria.
+- **Idiomas:** painel e pôster em português, inglês, espanhol, francês, alemão e italiano. O idioma do site é detectado pelo navegador e pode ser trocado no topo do painel; o idioma da arte (data, planetas, Lua, pontos cardeais e mensagem padrão) pode ser diferente do idioma do site.
 - **Exportação:** PNG em resolução configurável ou SVG vetorial, já com o tamanho físico do quadro em cm.
 
 ## Como usar
@@ -49,6 +50,7 @@ js/observer.js   Observador: data, hora e posição (Ernie Wright)
 js/skypos.js     Posições de Sol, Lua e planetas (Ernie Wright)
 js/skydb.js      Catálogo de estrelas, constelações e DSOs (Ernie Wright)
 js/plani.js      Desenho do céu, pôster, controles e exportação
+js/i18n.js       Traduções (pt, en, es, fr, de, it)
 js/fonts.js      Fontes: pré-programadas, importadas e do dafont
 js/location.js   Busca de endereços e escolha do local no mapa
 js/jscolor.js    Seletor de cores (jscolor)
