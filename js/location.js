@@ -8,6 +8,13 @@
 var PHOTON_URL = "https://photon.komoot.io";
 var TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 
+// O Photon traduz nomes de lugares para alguns idiomas (os outros recebem
+// os nomes locais). Usa o idioma da arte, porque o nome vai para o pôster.
+function photon_lang() {
+	var l = poster_lang();
+	return ["en", "de", "fr"].indexOf(l) >= 0 ? "&lang=" + l : "";
+}
+
 // ----- Aplicar um local -----
 
 // Nome legível de um resultado do Photon. A forma curta (cidade, estado,
@@ -30,7 +37,7 @@ function apply_place(lat, lon, name) {
 // Ponto sem nome (mapa, "Minha localização"): aplica e descobre o nome depois
 function pick_point(lat, lon) {
 	apply_place(lat, lon, "");
-	fetch_ok(PHOTON_URL + "/reverse?lat=" + lat + "&lon=" + lon)
+	fetch_ok(PHOTON_URL + "/reverse?lat=" + lat + "&lon=" + lon + photon_lang())
 		.then(function (r) { return r.json(); })
 		.then(function (data) {
 			var f = data.features && data.features[0];
@@ -70,7 +77,7 @@ function on_place_search_input() {
 	var q = document.getElementById("place_search").value.trim();
 	cancel_search();
 	if (q.length < 3) {
-		show_suggestions([], q.length ? "Digite pelo menos 3 letras." : "");
+		show_suggestions([], q.length ? t("search_min") : "");
 		return;
 	}
 	search_timer = setTimeout(function () { run_place_search(q); }, 350);
@@ -78,19 +85,19 @@ function on_place_search_input() {
 
 function run_place_search(q) {
 	search_ctrl = new AbortController();
-	show_suggestions([], "Buscando…");
-	fetch_ok(PHOTON_URL + "/api/?limit=6&q=" + encodeURIComponent(q), { signal: search_ctrl.signal })
+	show_suggestions([], t("search_loading"));
+	fetch_ok(PHOTON_URL + "/api/?limit=6&q=" + encodeURIComponent(q) + photon_lang(), { signal: search_ctrl.signal })
 		.then(function (r) { return r.json(); })
 		.then(function (data) {
 			var items = (data.features || []).map(function (f) {
 				return { lat: f.geometry.coordinates[1], lon: f.geometry.coordinates[0], props: f.properties };
 			});
-			show_suggestions(items, items.length ? "" : "Nenhum lugar encontrado.");
+			show_suggestions(items, items.length ? "" : t("search_none"));
 		})
 		.catch(function (err) {
 			if (err.name === "AbortError") return;
 			console.warn("Busca de local:", err);
-			show_suggestions([], "Não foi possível buscar agora. Verifique a conexão ou use o mapa.", "error");
+			show_suggestions([], t("search_fail"), "error");
 		});
 }
 
@@ -202,7 +209,7 @@ function open_map_picker() {
 	}).catch(function (err) {
 		console.warn("Mapa:", err);
 		close_map_picker();
-		alert("Não foi possível abrir o mapa. Verifique a conexão ou use a busca.");
+		alert(t("map_fail"));
 	});
 }
 
